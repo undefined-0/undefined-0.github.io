@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>AT89S52_test2</title>
-    <url>/2024/07/22/AT89S52-test2/</url>
-    <content><![CDATA[<h2 id="实验二-并行接口输入输出实验"><a href="#实验二-并行接口输入输出实验" class="headerlink" title="实验二 并行接口输入输出实验"></a>实验二 并行接口输入输出实验</h2><h3 id="test-2-1"><a href="#test-2-1" class="headerlink" title="test 2_1"></a>test 2_1</h3><p>选用输出口接八只发光二极管，编写程序，使发光二极管循环点亮（采用软件延时）<br>接线方法：使用P1口连接LED</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">LOOP:</span><br><span class="line">MOV P1,A ;点亮P1.0连接的LED</span><br><span class="line">LCALL DELAY</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">SJMP LOOP</span><br><span class="line"></span><br><span class="line"> DELAY: MOV R0,#0AH ;延时子程序(延时时间约1秒)</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$</span><br><span class="line">DJNZ R1,DELAY2</span><br><span class="line">DJNZ R0,DELAY1</span><br><span class="line">RET</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-2-2"><a href="#test-2-2" class="headerlink" title="test 2_2"></a>test 2_2</h3><p>采用一个输入口和一个输出口，将开关的状态反映在发光二极管上<br>接线方法：P1口接开关，P0口接LED</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">LOOP:</span><br><span class="line">ORL P1,#0FFH ;读P1口之前先对其写1</span><br><span class="line">MOV A,P1 ;将P1口状态（按键状态）读入A</span><br><span class="line">MOV P0,A ;将按键状态送至P0，使其在LED上反映出来</span><br><span class="line">SJMP LOOP</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-  </entry>
-  <entry>
     <title>AT89S52_test3</title>
     <url>/2024/07/22/AT89S52-test3/</url>
     <content><![CDATA[<h2 id="实验三-外部中断实验"><a href="#实验三-外部中断实验" class="headerlink" title="实验三 外部中断实验"></a>实验三 外部中断实验</h2><h3 id="test-3-1"><a href="#test-3-1" class="headerlink" title="test 3_1"></a>test 3_1</h3><p>通过外部中断使P1口的开关控制8个发光二极管，开始是P1.0所接的灯亮，以后每中断一次，下一个灯亮，顺序左移，周而复始。</p>
@@ -27,32 +14,6 @@
 <h3 id="test-3-3"><a href="#test-3-3" class="headerlink" title="test 3_3"></a>test 3_3</h3><p>外部中断控制P1口连接的8个发光二极管。<br>中断第一次，8个发光二极管循环点亮；<br>中断第二次，8个发光二极管逐个点亮；<br>中断第三次，8个发光二极管高四位和低四位交替亮灭。<br>如此循环往复。</p>
 <p>接线方法：P1口接8个LED，P3.2接按键</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">	</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">	</span><br><span class="line">ORG 0030H</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH</span><br><span class="line">MOV P1,A ;开始灯全灭</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">RELOAD:MOV R3,#03H ;计数变量</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A ;点亮P1.0所接的灯</span><br><span class="line">	</span><br><span class="line">LOOP0:</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#03,LOOP1</span><br><span class="line">SJMP LOOP0</span><br><span class="line">	</span><br><span class="line">LOOP1:</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A</span><br><span class="line">MOV R4,#00H</span><br><span class="line">ACALL DELAY</span><br><span class="line">LOOP11:</span><br><span class="line">ADD A,ACC</span><br><span class="line">MOV P1,A</span><br><span class="line">INC R4 ;计算是否满8次</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#02,LOOP2</span><br><span class="line">CJNE R4,#08H,LOOP11 ;不满8次，继续逐个点亮</span><br><span class="line">SJMP LOOP1 ;满8次，重新从全灭开始逐个点亮</span><br><span class="line">	</span><br><span class="line">LOOP2:</span><br><span class="line">MOV A,#0FH</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CPL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#01,RELOAD</span><br><span class="line">SJMP LOOP2</span><br><span class="line">	</span><br><span class="line">INTERRUPT1:</span><br><span class="line">DEC R3 ;R3减一</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">DELAY: MOV R0,#0AH</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$ </span><br><span class="line">DJNZ R1,DELAY2 </span><br><span class="line">DJNZ R0,DELAY1 </span><br><span class="line">RET</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>AT89S52_test1</title>
-    <url>/2024/07/22/AT89S52-test1/</url>
-    <content><![CDATA[<h2 id="写在最前面"><a href="#写在最前面" class="headerlink" title="写在最前面"></a>写在最前面</h2><p>本分类内使用的单片机皆为AT89S52，外接晶振频率为11.059MHz。</p>
-<h2 id="实验一-验证实验"><a href="#实验一-验证实验" class="headerlink" title="实验一 验证实验"></a>实验一 验证实验</h2><h3 id="test-1-1"><a href="#test-1-1" class="headerlink" title="test 1_1"></a>test 1_1</h3><p>将外部数据存储器0000H-0010H中的内容传送到片内数据存储器60H-70H单元。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV DPTR,#0000H</span><br><span class="line">MOV R0,#60H</span><br><span class="line">LOOP:</span><br><span class="line">MOVX A,@DPTR</span><br><span class="line">MOVX @R0,A</span><br><span class="line">INC DPTR</span><br><span class="line">INC R0</span><br><span class="line">CJNE R0 ,#71H,LOOP</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-1-2"><a href="#test-1-2" class="headerlink" title="test 1_2"></a>test 1_2</h3><p>程序跳转表</p>
-<p>(1)运行程序,打开数据窗口,观察地址 30H、31H、32H、33H的数据变化。用键盘输入改变地址 30H、31H、32H、33H 的值，观察其实验效果。修改源程序中给30H~33H的赋值，观察实验效果。</p>
-<p>(2)打开CPU窗口，选择单步或跟踪执行方式运行程序，观察CPU窗口各寄存器的变化。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0</span><br><span class="line">LJMP START // 改动此处，改变的是赋值</span><br><span class="line">FUNC0:MOV 30H,#0</span><br><span class="line">RET</span><br><span class="line">FUNC1:MOV 31H,#1</span><br><span class="line">RET</span><br><span class="line">FUNC2:MOV 32H,#2</span><br><span class="line">RET</span><br><span class="line">FUNC3:MOV 33H,#3</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">FUNCENTER:</span><br><span class="line">ADD A,ACC // AJMP是一个2字节指令，故A需要乘以2，使得程序在JMP指令中跳转到正确的位置</span><br><span class="line">MOV DPTR,#FUNCTAB</span><br><span class="line">JMP @A+DPTR</span><br><span class="line"></span><br><span class="line">FUNCTAB:</span><br><span class="line">AJMP FUNC0</span><br><span class="line">AJMP FUNC1</span><br><span class="line">AJMP FUNC2</span><br><span class="line">AJMP FUNC3</span><br><span class="line"></span><br><span class="line">START:</span><br><span class="line">MOV A,#0</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#1</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#2</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#3</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">LJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-1-3"><a href="#test-1-3" class="headerlink" title="test 1_3"></a>test 1_3</h3><h4 id="test1-3-1"><a href="#test1-3-1" class="headerlink" title="test1_3_1"></a>test1_3_1</h4><p>教材第55页5题。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#56H</span><br><span class="line">ADD A,#74H ; CAH+CAH = 194H，高位舍弃</span><br><span class="line">ADD A,ACC</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h4 id="test1-3-2"><a href="#test1-3-2" class="headerlink" title="test1_3_2"></a>test1_3_2</h4><p>教材第55页7题。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV 59H,#50H</span><br><span class="line">MOV A,59H</span><br><span class="line">MOV R0,A</span><br><span class="line">MOV A,#0</span><br><span class="line">MOV @R0,A</span><br><span class="line">MOV A,#25H</span><br><span class="line">MOV 51H,A</span><br><span class="line">MOV 52H,#70H</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h4 id="test1-3-3"><a href="#test1-3-3" class="headerlink" title="test1_3_3"></a>test1_3_3</h4><p>教材第55页8题。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV SP,#60H</span><br><span class="line">MOV 30H,#24H</span><br><span class="line">MOV 31H,#10H</span><br><span class="line">PUSH 30H</span><br><span class="line">PUSH 31H</span><br><span class="line">POP DPL</span><br><span class="line">POP DPH</span><br><span class="line">MOV A,#00H</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">SJMP $</span><br></pre></td></tr></table></figure>
-
-]]></content>
       <categories>
         <category>AT89S52</category>
       </categories>
@@ -99,6 +60,62 @@
       </categories>
   </entry>
   <entry>
+    <title>AT89S52_test6</title>
+    <url>/2024/07/22/AT89S52-test6/</url>
+    <content><![CDATA[<h2 id="实验六-A-D-D-A-实验"><a href="#实验六-A-D-D-A-实验" class="headerlink" title="实验六 A&#x2F;D D&#x2F;A 实验"></a>实验六 A&#x2F;D D&#x2F;A 实验</h2><h3 id="test-6-1"><a href="#test-6-1" class="headerlink" title="test 6_1"></a>test 6_1</h3><p>A&#x2F;D实验<br>用AT89S52的MCU驱动ADC0809进行模数转换。程序启动时，由8个LED显示AD0809通道0的电压值（以二进制数形式）。<br>接线方法：实验书P108硬件连接表（忽略数码管部分，将P1口连至LED处）</p>
+<img src="AT89S52-test6/image-20240722150702777.png" alt="image-20240722150702777" style="zoom: 50%;" />
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">EOC 	BIT 	P3.0</span><br><span class="line"></span><br><span class="line">ORG 	0000H</span><br><span class="line">LJMP	MAIN</span><br><span class="line">ORG		0100H</span><br><span class="line"></span><br><span class="line">MAIN:	</span><br><span class="line">	MOV	A,#0FFH</span><br><span class="line">	MOV P0,A</span><br><span class="line">	MOV A,#00H</span><br><span class="line">	MOV P2,A</span><br><span class="line"></span><br><span class="line">LOOP:</span><br><span class="line">	MOV DPTR,#7FFFH ;选择P2.7（若给P2口赋全0，则接线时可以选取P2口的任意一位接片选信号CS）</span><br><span class="line">    MOV A,#00H ;任意值</span><br><span class="line">    MOVX @DPTR,A ;给AD一个写操作，启动转换</span><br><span class="line">    JNB EOC,$ ;等待转换结束</span><br><span class="line">	MOVX A,@DPTR ;将转换结果读入A       </span><br><span class="line">    MOV	P1,A ;将转换结果从P1输出</span><br><span class="line">	LJMP LOOP</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-6-2"><a href="#test-6-2" class="headerlink" title="test 6_2"></a>test 6_2</h3><p>D&#x2F;A实验<br>实现D&#x2F;A接口设计，编写程序输出占空比为1&#x2F;3的方波、锯齿波、三角波、正弦波。<br>用2个开关控制输出波形的类型，使用示波器观察波形。</p>
+<p>接线方法：P0接数模转换区DB0-DB7，P2.7接数模转换区CS，P3.6接数模转换区WR。<br>示波器红表笔接DA输出，黑表笔接GND。<br>P3.2（INT0）、P3.3（INT1）各接一个拨码开关，初始时置为高。</p>
+<p>效果：11-锯齿波 10-三角波 01-方波 00-正弦波</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line"></span><br><span class="line">ORG 0003H</span><br><span class="line">LJMP INT0_ISR</span><br><span class="line"></span><br><span class="line">ORG 0013H</span><br><span class="line">LJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">ORG 0050H</span><br><span class="line">MAIN:</span><br><span class="line">MOV IE,#85H ;1000 0101，允许外部中断INT1和INT0，开中断总开关</span><br><span class="line">SETB PX1 ;设外部中断1为高优先级中断</span><br><span class="line">; TCON不作其他配置，保持复位时的全0（外部中断触发方式为低电平）</span><br><span class="line"></span><br><span class="line">;MOV R0 #02H ;为控制方波占空比而设置的计数变量</span><br><span class="line"></span><br><span class="line">SAWTOOTH: ;锯齿波</span><br><span class="line">CLR A</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">LOOP_SAWTOOTH:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">SJMP LOOP_SAWTOOTH</span><br><span class="line"></span><br><span class="line">INT0_ISR:	;P3.2所接的开关置为低时进入外部中断0</span><br><span class="line">SQUARE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">LOOP_SQUARE:</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;高电平 一段延时</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;低电平 两段延时</span><br><span class="line">ACALL DELAY</span><br><span class="line">JB P3.2,EXIT ;若P3.2所接的开关被置为高，则退出中断</span><br><span class="line">SJMP LOOP_SQUARE ;若P3.2所接的开关仍为低，则继续输出方波</span><br><span class="line"></span><br><span class="line">DELAY:</span><br><span class="line">MOV R7,#0FFH</span><br><span class="line">DJNZ R7,$</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">EXIT:</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">INT1_ISR:	;P3.3所接的开关置为低时进入外部中断1</span><br><span class="line">JB P3.2,TRIANGLE	;若P3.2所接的开关被置为高，则输出三角波。否则输出正弦波。</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line"></span><br><span class="line">SIN:</span><br><span class="line">MOV R1,#63 ;一个周期内输出64个点</span><br><span class="line">LOOP_SIN:</span><br><span class="line">MOV DPTR,#TAB</span><br><span class="line">MOV A,R1</span><br><span class="line">MOVC A,@A+DPTR</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">NOP	;延时，可根据实际情况更改</span><br><span class="line">DJNZ R1,LOOP_SIN</span><br><span class="line">SJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">TAB:	;正弦波数据表</span><br><span class="line">DB 80H,8CH,98H,0A5H,0B0H,0BCH,0C7H,0D1H</span><br><span class="line">DB 0DAH,0E2H,0EAH,0F0H,0F6H,0FAH,0FDH,0FFH</span><br><span class="line">DB 0FFH,0FFH,0FDH,0FAH,0F6H,0F0H,0EAH,0E3H</span><br><span class="line">DB 0DAH,0D1H,0C7H,0BCH,0B1H,0A5H,99H,8CH</span><br><span class="line">DB 80H,73H,67H,5BH,4FH,43H,39H,2EH</span><br><span class="line">DB 25H,1DH,15H,0FH,09H,05H,02H,00H</span><br><span class="line">DB 00H,00H,02H,05H,09H,0EH,15H,1CH</span><br><span class="line">DB 25H,2EH,38H,43H,4EH,5AH,66H,73H</span><br><span class="line"></span><br><span class="line">TRIANGLE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">LOOP_TRIANGLE_INC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">CJNE A,#0FFH,LOOP_TRIANGLE_INC</span><br><span class="line">LOOP_TRIANGLE_DEC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">DEC A</span><br><span class="line">JNZ LOOP_TRIANGLE_DEC</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line">JNB P3.2,INT1_ISR	;若P3.2所接的开关被置为低，则进入中断服务程序1</span><br><span class="line">LJMP LOOP_TRIANGLE_INC</span><br><span class="line"></span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>AT89S52_test1</title>
+    <url>/2024/07/22/AT89S52-test1/</url>
+    <content><![CDATA[<h2 id="写在最前面"><a href="#写在最前面" class="headerlink" title="写在最前面"></a>写在最前面</h2><p>本分类内使用的单片机皆为AT89S52，外接晶振频率为11.059MHz。</p>
+<h2 id="实验一-验证实验"><a href="#实验一-验证实验" class="headerlink" title="实验一 验证实验"></a>实验一 验证实验</h2><h3 id="test-1-1"><a href="#test-1-1" class="headerlink" title="test 1_1"></a>test 1_1</h3><p>将外部数据存储器0000H-0010H中的内容传送到片内数据存储器60H-70H单元。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV DPTR,#0000H</span><br><span class="line">MOV R0,#60H</span><br><span class="line">LOOP:</span><br><span class="line">MOVX A,@DPTR</span><br><span class="line">MOVX @R0,A</span><br><span class="line">INC DPTR</span><br><span class="line">INC R0</span><br><span class="line">CJNE R0 ,#71H,LOOP</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-1-2"><a href="#test-1-2" class="headerlink" title="test 1_2"></a>test 1_2</h3><p>程序跳转表</p>
+<p>(1)运行程序,打开数据窗口,观察地址 30H、31H、32H、33H的数据变化。用键盘输入改变地址 30H、31H、32H、33H 的值，观察其实验效果。修改源程序中给30H~33H的赋值，观察实验效果。</p>
+<p>(2)打开CPU窗口，选择单步或跟踪执行方式运行程序，观察CPU窗口各寄存器的变化。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0</span><br><span class="line">LJMP START // 改动此处，改变的是赋值</span><br><span class="line">FUNC0:MOV 30H,#0</span><br><span class="line">RET</span><br><span class="line">FUNC1:MOV 31H,#1</span><br><span class="line">RET</span><br><span class="line">FUNC2:MOV 32H,#2</span><br><span class="line">RET</span><br><span class="line">FUNC3:MOV 33H,#3</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">FUNCENTER:</span><br><span class="line">ADD A,ACC // AJMP是一个2字节指令，故A需要乘以2，使得程序在JMP指令中跳转到正确的位置</span><br><span class="line">MOV DPTR,#FUNCTAB</span><br><span class="line">JMP @A+DPTR</span><br><span class="line"></span><br><span class="line">FUNCTAB:</span><br><span class="line">AJMP FUNC0</span><br><span class="line">AJMP FUNC1</span><br><span class="line">AJMP FUNC2</span><br><span class="line">AJMP FUNC3</span><br><span class="line"></span><br><span class="line">START:</span><br><span class="line">MOV A,#0</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#1</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#2</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#3</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">LJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-1-3"><a href="#test-1-3" class="headerlink" title="test 1_3"></a>test 1_3</h3><h4 id="test1-3-1"><a href="#test1-3-1" class="headerlink" title="test1_3_1"></a>test1_3_1</h4><p>教材第55页5题。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#56H</span><br><span class="line">ADD A,#74H ; CAH+CAH = 194H，高位舍弃</span><br><span class="line">ADD A,ACC</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h4 id="test1-3-2"><a href="#test1-3-2" class="headerlink" title="test1_3_2"></a>test1_3_2</h4><p>教材第55页7题。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV 59H,#50H</span><br><span class="line">MOV A,59H</span><br><span class="line">MOV R0,A</span><br><span class="line">MOV A,#0</span><br><span class="line">MOV @R0,A</span><br><span class="line">MOV A,#25H</span><br><span class="line">MOV 51H,A</span><br><span class="line">MOV 52H,#70H</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h4 id="test1-3-3"><a href="#test1-3-3" class="headerlink" title="test1_3_3"></a>test1_3_3</h4><p>教材第55页8题。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV SP,#60H</span><br><span class="line">MOV 30H,#24H</span><br><span class="line">MOV 31H,#10H</span><br><span class="line">PUSH 30H</span><br><span class="line">PUSH 31H</span><br><span class="line">POP DPL</span><br><span class="line">POP DPH</span><br><span class="line">MOV A,#00H</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">SJMP $</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>AT89S52_test2</title>
+    <url>/2024/07/22/AT89S52-test2/</url>
+    <content><![CDATA[<h2 id="实验二-并行接口输入输出实验"><a href="#实验二-并行接口输入输出实验" class="headerlink" title="实验二 并行接口输入输出实验"></a>实验二 并行接口输入输出实验</h2><h3 id="test-2-1"><a href="#test-2-1" class="headerlink" title="test 2_1"></a>test 2_1</h3><p>选用输出口接八只发光二极管，编写程序，使发光二极管循环点亮（采用软件延时）<br>接线方法：使用P1口连接LED</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">LOOP:</span><br><span class="line">MOV P1,A ;点亮P1.0连接的LED</span><br><span class="line">LCALL DELAY</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">SJMP LOOP</span><br><span class="line"></span><br><span class="line"> DELAY: MOV R0,#0AH ;延时子程序(延时时间约1秒)</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$</span><br><span class="line">DJNZ R1,DELAY2</span><br><span class="line">DJNZ R0,DELAY1</span><br><span class="line">RET</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-2-2"><a href="#test-2-2" class="headerlink" title="test 2_2"></a>test 2_2</h3><p>采用一个输入口和一个输出口，将开关的状态反映在发光二极管上<br>接线方法：P1口接开关，P0口接LED</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">LOOP:</span><br><span class="line">ORL P1,#0FFH ;读P1口之前先对其写1</span><br><span class="line">MOV A,P1 ;将P1口状态（按键状态）读入A</span><br><span class="line">MOV P0,A ;将按键状态送至P0，使其在LED上反映出来</span><br><span class="line">SJMP LOOP</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+  </entry>
+  <entry>
     <title>AT89S52_test7</title>
     <url>/2024/07/24/AT89S52-test7/</url>
     <content><![CDATA[<h2 id="实验七-综合实验-（定时器控制方式）"><a href="#实验七-综合实验-（定时器控制方式）" class="headerlink" title="实验七 综合实验 （定时器控制方式）"></a>实验七 综合实验 （定时器控制方式）</h2><h3 id="test-7-1"><a href="#test-7-1" class="headerlink" title="test 7_1"></a>test 7_1</h3><p>用 P1 口作为输出口实现循环彩灯。（至少要有 5 种形式） </p>
@@ -115,6 +132,29 @@
       <categories>
         <category>AT89S52</category>
       </categories>
+  </entry>
+  <entry>
+    <title>AT89S52_test8</title>
+    <url>/2024/07/24/AT89S52-test8/</url>
+    <content><![CDATA[<h2 id="实验八-综合实验-十字路口交通灯"><a href="#实验八-综合实验-十字路口交通灯" class="headerlink" title="实验八 综合实验 十字路口交通灯"></a>实验八 综合实验 十字路口交通灯</h2><p>南北红灯（D1、D7）亮维持15秒，在南北红灯亮的同时东西绿灯（D5、D11）也亮，并维持10s。<br>到10s时，东西绿灯（D5、D11）闪亮，闪亮3s后熄灭。<br>在东西绿灯（D5、D11）熄灭时，东西黄灯（D6、D12）亮，并维持2秒。<br>到2秒时，东西黄灯（D6、D12）熄灭，东西红灯（D4、D10）亮，同时南北红灯（D1、D7）熄灭，绿灯（D2、D8）亮。</p>
+<p>接线方法：<br>    P1.0—P3.5	T1输入<br>    P1.1—D1 D7	南北红<br>    P1.2—D2 D8	南北绿<br>    P1.3—D3 D9	南北黄<br>    P1.4—D4 D10	东西红<br>    P1.5—D5 D11	东西绿<br>    P1.6—D6 D12	东西黄<br> 注：交通灯模块的LED为置低点亮</p>
+<p>T0定时50ms，使P1.0口输出周期为100ms的方波，作为计数器T1的输入<br>T1重装载值：<br> 0FB—0.5s<br> 0F6—1s<br> 0EC—2s<br> 0E2—3s<br> 9C—10s<br> 6A—15s</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">; EW -&gt; East &amp; West，东西</span><br><span class="line">; SN -&gt; South &amp; North，南北</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">SJMP MAIN</span><br><span class="line"></span><br><span class="line">ORG 000BH ;T0（定时器）中断服务程序入口</span><br><span class="line">LJMP T0_ISR</span><br><span class="line"></span><br><span class="line">ORG 0030H</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH</span><br><span class="line">MOV P1,A ;所有灯熄灭</span><br><span class="line">MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">MOV TH0,#4CH</span><br><span class="line">MOV TL0,#01H</span><br><span class="line">SETB ET0 ;允许T0中断</span><br><span class="line">SETB TR0 ;启动T0</span><br><span class="line">SETB EA ;开中断总控</span><br><span class="line"></span><br><span class="line">LOOP:</span><br><span class="line">MOV TH1,#9CH ;10s</span><br><span class="line">MOV TL1,#9CH</span><br><span class="line">;T1采用查询方式，不允许中断</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line"></span><br><span class="line">CLR P1.5 ;点亮东西绿</span><br><span class="line">CLR P1.1 ;点亮南北红</span><br><span class="line">JNB TF1,$ ;若10s未到，等待</span><br><span class="line">MOV R0,#06H ;10s到了,装载R0（为控制绿灯闪烁次数而设的计数变量）</span><br><span class="line">CALL_EW_GREEN_FLASH:</span><br><span class="line">ACALL GREEN_EW_FLASH ;绿灯闪烁（闪烁三秒---&gt;调用六次）</span><br><span class="line">DJNZ R0,CALL_EW_GREEN_FLASH</span><br><span class="line">SETB P1.5;东西绿闪烁结束，熄灭东西绿</span><br><span class="line">CLR TR1 ;停止T1</span><br><span class="line">CLR P1.6;点亮东西黄</span><br><span class="line">MOV TH1,#0ECH ;2s</span><br><span class="line">MOV TL1,#0ECH</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line">JNB TF1,$ ;若2s未到，等待</span><br><span class="line">CLR TR1 ;2s到了，停止T1</span><br><span class="line">CLR TF1 ;清中断标志位</span><br><span class="line">SETB P1.6;熄灭东西黄</span><br><span class="line">SETB P1.1;熄灭南北红</span><br><span class="line">CLR P1.4;点亮东西红</span><br><span class="line">CLR P1.2;点亮南北绿</span><br><span class="line">MOV TH1,#9CH ;10s</span><br><span class="line">MOV TL1,#9CH</span><br><span class="line">SETB TR1;启动T1</span><br><span class="line">JNB TF1,$ ;若10s未到，等待</span><br><span class="line">MOV R0,#06H ;10s到了,装载R0（为控制绿灯闪烁次数而设的计数变量）</span><br><span class="line">CALL_SN_GREEN_FLASH:</span><br><span class="line">ACALL GREEN_SN_FLASH ;绿灯闪烁（闪烁三秒---&gt;调用六次）</span><br><span class="line">DJNZ R0,CALL_SN_GREEN_FLASH</span><br><span class="line">SETB P1.2;南北绿闪烁结束，熄灭南北绿</span><br><span class="line">CLR TR1 ;停止T1</span><br><span class="line">CLR P1.3;点亮南北黄</span><br><span class="line">MOV TH1,#0ECH ;2s</span><br><span class="line">MOV TL1,#0ECH</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line">JNB TF1,$ ;若2s未到，等待</span><br><span class="line">CLR TR1 ;2s到了，停止T1</span><br><span class="line">CLR TF1 ;清中断标志位</span><br><span class="line">SETB P1.3;熄灭南北黄</span><br><span class="line">SETB P1.4;熄灭东西红</span><br><span class="line">SJMP LOOP</span><br><span class="line"></span><br><span class="line">T0_ISR: ;50ms到了</span><br><span class="line">MOV TH0,#4CH ;重装载</span><br><span class="line">MOV TL0,#01H</span><br><span class="line">CPL P1.0</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">GREEN_EW_FLASH:</span><br><span class="line">JNB TF1,$ ;若0.5s未到，等待（第一次进入GREEN_EW_FLASH时，标志位TF1未清零，不会等待）</span><br><span class="line">CLR TR1 ;0.5s到了，停止T1</span><br><span class="line">CLR TF1 ;清中断标志位</span><br><span class="line">CPL P1.5 ;东西绿开始闪烁</span><br><span class="line">MOV TH1,#0FBH ;0.5s</span><br><span class="line">MOV TL1,#0FBH</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">GREEN_SN_FLASH:</span><br><span class="line">JNB TF1,$ ;若0.5s未到，等待（第一次进入GREEN_SN_FLASH时，标志位TF1未清零，不会等待）</span><br><span class="line">CLR TR1 ;0.5s到了，停止T1</span><br><span class="line">CLR TF1 ;清中断标志位</span><br><span class="line">CPL P1.2 ;南北绿开始闪烁</span><br><span class="line">MOV TH1,#0FBH ;0.5s</span><br><span class="line">MOV TL1,#0FBH</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Hello World!</title>
+    <url>/2024/06/30/HelloWorld/</url>
+    <content><![CDATA[<blockquote class="blockquote-center">
+            <i class="fa fa-quote-left"></i>
+            <p>今天是2024年6月30日，我创建了我的个人博客。</p>
+
+            <i class="fa fa-quote-right"></i>
+          </blockquote>
+]]></content>
   </entry>
   <entry>
     <title>实验一_数据库定义实验</title>
@@ -251,46 +291,6 @@
       </categories>
   </entry>
   <entry>
-    <title>Hello World!</title>
-    <url>/2024/06/30/HelloWorld/</url>
-    <content><![CDATA[<blockquote class="blockquote-center">
-            <i class="fa fa-quote-left"></i>
-            <p>今天是2024年6月30日，我创建了我的个人博客。</p>
-
-            <i class="fa fa-quote-right"></i>
-          </blockquote>
-]]></content>
-  </entry>
-  <entry>
-    <title>AT89S52_test8</title>
-    <url>/2024/07/24/AT89S52-test8/</url>
-    <content><![CDATA[<h2 id="实验八-综合实验-十字路口交通灯"><a href="#实验八-综合实验-十字路口交通灯" class="headerlink" title="实验八 综合实验 十字路口交通灯"></a>实验八 综合实验 十字路口交通灯</h2><p>南北红灯（D1、D7）亮维持15秒，在南北红灯亮的同时东西绿灯（D5、D11）也亮，并维持10s。<br>到10s时，东西绿灯（D5、D11）闪亮，闪亮3s后熄灭。<br>在东西绿灯（D5、D11）熄灭时，东西黄灯（D6、D12）亮，并维持2秒。<br>到2秒时，东西黄灯（D6、D12）熄灭，东西红灯（D4、D10）亮，同时南北红灯（D1、D7）熄灭，绿灯（D2、D8）亮。</p>
-<p>接线方法：<br>    P1.0—P3.5	T1输入<br>    P1.1—D1 D7	南北红<br>    P1.2—D2 D8	南北绿<br>    P1.3—D3 D9	南北黄<br>    P1.4—D4 D10	东西红<br>    P1.5—D5 D11	东西绿<br>    P1.6—D6 D12	东西黄<br> 注：交通灯模块的LED为置低点亮</p>
-<p>T0定时50ms，使P1.0口输出周期为100ms的方波，作为计数器T1的输入<br>T1重装载值：<br> 0FB—0.5s<br> 0F6—1s<br> 0EC—2s<br> 0E2—3s<br> 9C—10s<br> 6A—15s</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">; EW -&gt; East &amp; West，东西</span><br><span class="line">; SN -&gt; South &amp; North，南北</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">SJMP MAIN</span><br><span class="line"></span><br><span class="line">ORG 000BH ;T0（定时器）中断服务程序入口</span><br><span class="line">LJMP T0_ISR</span><br><span class="line"></span><br><span class="line">ORG 0030H</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH</span><br><span class="line">MOV P1,A ;所有灯熄灭</span><br><span class="line">MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">MOV TH0,#4CH</span><br><span class="line">MOV TL0,#01H</span><br><span class="line">SETB ET0 ;允许T0中断</span><br><span class="line">SETB TR0 ;启动T0</span><br><span class="line">SETB EA ;开中断总控</span><br><span class="line"></span><br><span class="line">LOOP:</span><br><span class="line">MOV TH1,#9CH ;10s</span><br><span class="line">MOV TL1,#9CH</span><br><span class="line">;T1采用查询方式，不允许中断</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line"></span><br><span class="line">CLR P1.5 ;点亮东西绿</span><br><span class="line">CLR P1.1 ;点亮南北红</span><br><span class="line">JNB TF1,$ ;若10s未到，等待</span><br><span class="line">MOV R0,#06H ;10s到了,装载R0（为控制绿灯闪烁次数而设的计数变量）</span><br><span class="line">CALL_EW_GREEN_FLASH:</span><br><span class="line">ACALL GREEN_EW_FLASH ;绿灯闪烁（闪烁三秒---&gt;调用六次）</span><br><span class="line">DJNZ R0,CALL_EW_GREEN_FLASH</span><br><span class="line">SETB P1.5;东西绿闪烁结束，熄灭东西绿</span><br><span class="line">CLR TR1 ;停止T1</span><br><span class="line">CLR P1.6;点亮东西黄</span><br><span class="line">MOV TH1,#0ECH ;2s</span><br><span class="line">MOV TL1,#0ECH</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line">JNB TF1,$ ;若2s未到，等待</span><br><span class="line">CLR TR1 ;2s到了，停止T1</span><br><span class="line">CLR TF1 ;清中断标志位</span><br><span class="line">SETB P1.6;熄灭东西黄</span><br><span class="line">SETB P1.1;熄灭南北红</span><br><span class="line">CLR P1.4;点亮东西红</span><br><span class="line">CLR P1.2;点亮南北绿</span><br><span class="line">MOV TH1,#9CH ;10s</span><br><span class="line">MOV TL1,#9CH</span><br><span class="line">SETB TR1;启动T1</span><br><span class="line">JNB TF1,$ ;若10s未到，等待</span><br><span class="line">MOV R0,#06H ;10s到了,装载R0（为控制绿灯闪烁次数而设的计数变量）</span><br><span class="line">CALL_SN_GREEN_FLASH:</span><br><span class="line">ACALL GREEN_SN_FLASH ;绿灯闪烁（闪烁三秒---&gt;调用六次）</span><br><span class="line">DJNZ R0,CALL_SN_GREEN_FLASH</span><br><span class="line">SETB P1.2;南北绿闪烁结束，熄灭南北绿</span><br><span class="line">CLR TR1 ;停止T1</span><br><span class="line">CLR P1.3;点亮南北黄</span><br><span class="line">MOV TH1,#0ECH ;2s</span><br><span class="line">MOV TL1,#0ECH</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line">JNB TF1,$ ;若2s未到，等待</span><br><span class="line">CLR TR1 ;2s到了，停止T1</span><br><span class="line">CLR TF1 ;清中断标志位</span><br><span class="line">SETB P1.3;熄灭南北黄</span><br><span class="line">SETB P1.4;熄灭东西红</span><br><span class="line">SJMP LOOP</span><br><span class="line"></span><br><span class="line">T0_ISR: ;50ms到了</span><br><span class="line">MOV TH0,#4CH ;重装载</span><br><span class="line">MOV TL0,#01H</span><br><span class="line">CPL P1.0</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">GREEN_EW_FLASH:</span><br><span class="line">JNB TF1,$ ;若0.5s未到，等待（第一次进入GREEN_EW_FLASH时，标志位TF1未清零，不会等待）</span><br><span class="line">CLR TR1 ;0.5s到了，停止T1</span><br><span class="line">CLR TF1 ;清中断标志位</span><br><span class="line">CPL P1.5 ;东西绿开始闪烁</span><br><span class="line">MOV TH1,#0FBH ;0.5s</span><br><span class="line">MOV TL1,#0FBH</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">GREEN_SN_FLASH:</span><br><span class="line">JNB TF1,$ ;若0.5s未到，等待（第一次进入GREEN_SN_FLASH时，标志位TF1未清零，不会等待）</span><br><span class="line">CLR TR1 ;0.5s到了，停止T1</span><br><span class="line">CLR TF1 ;清中断标志位</span><br><span class="line">CPL P1.2 ;南北绿开始闪烁</span><br><span class="line">MOV TH1,#0FBH ;0.5s</span><br><span class="line">MOV TL1,#0FBH</span><br><span class="line">SETB TR1 ;启动T1</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>AT89S52_test6</title>
-    <url>/2024/07/22/AT89S52-test6/</url>
-    <content><![CDATA[<h2 id="实验六-A-D-D-A-实验"><a href="#实验六-A-D-D-A-实验" class="headerlink" title="实验六 A&#x2F;D D&#x2F;A 实验"></a>实验六 A&#x2F;D D&#x2F;A 实验</h2><h3 id="test-6-1"><a href="#test-6-1" class="headerlink" title="test 6_1"></a>test 6_1</h3><p>A&#x2F;D实验<br>用AT89S52的MCU驱动ADC0809进行模数转换。程序启动时，由8个LED显示AD0809通道0的电压值（以二进制数形式）。<br>接线方法：实验书P108硬件连接表（忽略数码管部分，将P1口连至LED处）</p>
-<img src="AT89S52-test6/image-20240722150702777.png" alt="image-20240722150702777" style="zoom: 50%;" />
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">EOC 	BIT 	P3.0</span><br><span class="line"></span><br><span class="line">ORG 	0000H</span><br><span class="line">LJMP	MAIN</span><br><span class="line">ORG		0100H</span><br><span class="line"></span><br><span class="line">MAIN:	</span><br><span class="line">	MOV	A,#0FFH</span><br><span class="line">	MOV P0,A</span><br><span class="line">	MOV A,#00H</span><br><span class="line">	MOV P2,A</span><br><span class="line"></span><br><span class="line">LOOP:</span><br><span class="line">	MOV DPTR,#7FFFH ;选择P2.7（若给P2口赋全0，则接线时可以选取P2口的任意一位接片选信号CS）</span><br><span class="line">    MOV A,#00H ;任意值</span><br><span class="line">    MOVX @DPTR,A ;给AD一个写操作，启动转换</span><br><span class="line">    JNB EOC,$ ;等待转换结束</span><br><span class="line">	MOVX A,@DPTR ;将转换结果读入A       </span><br><span class="line">    MOV	P1,A ;将转换结果从P1输出</span><br><span class="line">	LJMP LOOP</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-6-2"><a href="#test-6-2" class="headerlink" title="test 6_2"></a>test 6_2</h3><p>D&#x2F;A实验<br>实现D&#x2F;A接口设计，编写程序输出占空比为1&#x2F;3的方波、锯齿波、三角波、正弦波。<br>用2个开关控制输出波形的类型，使用示波器观察波形。</p>
-<p>接线方法：P0接数模转换区DB0-DB7，P2.7接数模转换区CS，P3.6接数模转换区WR。<br>示波器红表笔接DA输出，黑表笔接GND。<br>P3.2（INT0）、P3.3（INT1）各接一个拨码开关，初始时置为高。</p>
-<p>效果：11-锯齿波 10-三角波 01-方波 00-正弦波</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line"></span><br><span class="line">ORG 0003H</span><br><span class="line">LJMP INT0_ISR</span><br><span class="line"></span><br><span class="line">ORG 0013H</span><br><span class="line">LJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">ORG 0050H</span><br><span class="line">MAIN:</span><br><span class="line">MOV IE,#85H ;1000 0101，允许外部中断INT1和INT0，开中断总开关</span><br><span class="line">SETB PX1 ;设外部中断1为高优先级中断</span><br><span class="line">; TCON不作其他配置，保持复位时的全0（外部中断触发方式为低电平）</span><br><span class="line"></span><br><span class="line">;MOV R0 #02H ;为控制方波占空比而设置的计数变量</span><br><span class="line"></span><br><span class="line">SAWTOOTH: ;锯齿波</span><br><span class="line">CLR A</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">LOOP_SAWTOOTH:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">SJMP LOOP_SAWTOOTH</span><br><span class="line"></span><br><span class="line">INT0_ISR:	;P3.2所接的开关置为低时进入外部中断0</span><br><span class="line">SQUARE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">LOOP_SQUARE:</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;高电平 一段延时</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;低电平 两段延时</span><br><span class="line">ACALL DELAY</span><br><span class="line">JB P3.2,EXIT ;若P3.2所接的开关被置为高，则退出中断</span><br><span class="line">SJMP LOOP_SQUARE ;若P3.2所接的开关仍为低，则继续输出方波</span><br><span class="line"></span><br><span class="line">DELAY:</span><br><span class="line">MOV R7,#0FFH</span><br><span class="line">DJNZ R7,$</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">EXIT:</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">INT1_ISR:	;P3.3所接的开关置为低时进入外部中断1</span><br><span class="line">JB P3.2,TRIANGLE	;若P3.2所接的开关被置为高，则输出三角波。否则输出正弦波。</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line"></span><br><span class="line">SIN:</span><br><span class="line">MOV R1,#63 ;一个周期内输出64个点</span><br><span class="line">LOOP_SIN:</span><br><span class="line">MOV DPTR,#TAB</span><br><span class="line">MOV A,R1</span><br><span class="line">MOVC A,@A+DPTR</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">NOP	;延时，可根据实际情况更改</span><br><span class="line">DJNZ R1,LOOP_SIN</span><br><span class="line">SJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">TAB:	;正弦波数据表</span><br><span class="line">DB 80H,8CH,98H,0A5H,0B0H,0BCH,0C7H,0D1H</span><br><span class="line">DB 0DAH,0E2H,0EAH,0F0H,0F6H,0FAH,0FDH,0FFH</span><br><span class="line">DB 0FFH,0FFH,0FDH,0FAH,0F6H,0F0H,0EAH,0E3H</span><br><span class="line">DB 0DAH,0D1H,0C7H,0BCH,0B1H,0A5H,99H,8CH</span><br><span class="line">DB 80H,73H,67H,5BH,4FH,43H,39H,2EH</span><br><span class="line">DB 25H,1DH,15H,0FH,09H,05H,02H,00H</span><br><span class="line">DB 00H,00H,02H,05H,09H,0EH,15H,1CH</span><br><span class="line">DB 25H,2EH,38H,43H,4EH,5AH,66H,73H</span><br><span class="line"></span><br><span class="line">TRIANGLE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">LOOP_TRIANGLE_INC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">CJNE A,#0FFH,LOOP_TRIANGLE_INC</span><br><span class="line">LOOP_TRIANGLE_DEC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">DEC A</span><br><span class="line">JNZ LOOP_TRIANGLE_DEC</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line">JNB P3.2,INT1_ISR	;若P3.2所接的开关被置为低，则进入中断服务程序1</span><br><span class="line">LJMP LOOP_TRIANGLE_INC</span><br><span class="line"></span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-  </entry>
-  <entry>
     <title>实验七-数据完整性与安全性实验</title>
     <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/</url>
     <content><![CDATA[<h1 id="实验七-数据完整性与安全性实验"><a href="#实验七-数据完整性与安全性实验" class="headerlink" title="实验七 数据完整性与安全性实验"></a>实验七 数据完整性与安全性实验</h1><h2 id="1-数据库安全性实验"><a href="#1-数据库安全性实验" class="headerlink" title="1)数据库安全性实验"></a>1)数据库安全性实验</h2><p>在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。</p>
@@ -352,27 +352,67 @@
       </categories>
   </entry>
   <entry>
-    <title>实验五-数据库的组合与统计查询实验</title>
-    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%BA%94-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E7%BB%84%E5%90%88%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
-    <content><![CDATA[<h1 id="实验五-数据库的组合与统计查询实验"><a href="#实验五-数据库的组合与统计查询实验" class="headerlink" title="实验五 数据库的组合与统计查询实验"></a>实验五 数据库的组合与统计查询实验</h1><h3 id="实验题目和要求："><a href="#实验题目和要求：" class="headerlink" title="实验题目和要求："></a>实验题目和要求：</h3><p>检查并修改图书读者库的数据，使之与表10-8至表10-10的数据一致；<br>检查并修改学生课程库的数据，便之与表10-11至表10-13的数据一致；<br>将下列查询要求用T-SQL语句表示；<br>在SSMS的查询分析器中输人相应的T-SQL语旬，执行并在结果区中查看内容；<br>结果不正确时要对T-SQL语句修改，直到正确为止。</p>
-<h3 id="1-在图书读者数据库中，按下列要求查询"><a href="#1-在图书读者数据库中，按下列要求查询" class="headerlink" title="(1) 在图书读者数据库中，按下列要求查询"></a>(1) 在图书读者数据库中，按下列要求查询</h3><p>​	1)查找图书类别，要求类别中最高图书定价不低于全部按类别分组的平均定价的2倍。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020912.png" alt="image-20240606230329833"></p>
-<p>​	2)求机械工业出版社出版的各类图书的平均定价，用GROUP BY表示。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020913.png" alt="image-20240531082608255"></p>
-<p>​	3)列出计算机类图书的书号、名称及价格，最后求出册数和总价格。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020914.png"></p>
-<p>​	4)列出计算机类图书的书号、名称及价格，并求出各出版社这类书的总价格，最后求出全部册数和总价格。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020915.png"></p>
-<p>​	5)查询计算机类和机械工业出版社出版的图书。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020916.png" alt="image-20240531090152465"></p>
-<h3 id="2-在学生课程数据库中，按下列要求查询"><a href="#2-在学生课程数据库中，按下列要求查询" class="headerlink" title="(2) 在学生课程数据库中，按下列要求查询"></a>(2) 在学生课程数据库中，按下列要求查询</h3><p>​	1)求学生的总人数。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020917.png" alt="image-20240531090441230"></p>
-<p>​	2)求选修了课程的学生人数。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020918.png" alt="image-20240531090657034"></p>
-<p>​	3)求课程和选修该课程的人数。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020919.png" alt="image-20240531091111076"></p>
-<p>​	4)求选修课超过3门课的学生学号。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020920.png" alt="image-20240531091326847"></p>
+    <title>实验三-数据库简单查询和连接查询实验</title>
+    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%89-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%80%E5%8D%95%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
+    <content><![CDATA[<h1 id="实验三-数据库简单查询和连接查询实验"><a href="#实验三-数据库简单查询和连接查询实验" class="headerlink" title="实验三 数据库简单查询和连接查询实验"></a>实验三 数据库简单查询和连接查询实验</h1><h2 id="1、基本操作实验"><a href="#1、基本操作实验" class="headerlink" title="1、基本操作实验"></a>1、基本操作实验</h2><ul>
+<li><p>本实验的主要内容如下：<br>（1）简单查询操作。该实验包括投影、选择条件表达，数据排序，使用临时表等。<br>（2）连接查询操作。该实验包括等值连接、自然连接、求笛卡儿积、一般连接、外连接、内连接、左连接、右连接和自连接等。</p>
+</li>
+<li><p>实验题目和要求：<br>​		检查并修改学生课程库的效据，使之与表10-11至表10-13的数据一致；将下列查询要求用T-SQL语句表示；在SSMS的查询分析器中输人相应的T-SQL语句，执行并在结果区中查看内容；结果不正确时要对T-SQL语句修改，直到正确为止。</p>
+</li>
+</ul>
+<h3 id="（1）简单查询实验内容"><a href="#（1）简单查询实验内容" class="headerlink" title="（1）简单查询实验内容"></a>（1）简单查询实验内容</h3><p>在学生课程数据库中：</p>
+<ol>
+<li><p>求数学系学生的学号和姓名。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017868.png" alt="image-20240511085620338"></p>
+</li>
+<li><p>求选修了课程的学生学号。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017869.png" alt="image-20240511085940442"></p>
+</li>
+</ol>
+<ol start="3">
+<li><p>求选修C1课程的学生学号和成绩，并要求对查询结果按成绩的降序排列，如果成绩相同则按学号的升序排列。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017870.png" alt="image-20240511090359145"></p>
+</li>
+<li><p>求选修课程C1且成绩在80-90之间的学生学号和成续，将成绩乘以系数0.8输出。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017871.png" alt="image-20240511090810858"></p>
+</li>
+<li><p>求数学系或计算机系姓张的学生的信息。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017872.png" alt="image-20240511091027963"></p>
+</li>
+<li><p>求缺少了成绩的学生的学号和课程号<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017873.png" alt="image-20240511091214888"></p>
+</li>
+</ol>
+<h3 id="（2）连接查询实验内容"><a href="#（2）连接查询实验内容" class="headerlink" title="（2）连接查询实验内容"></a>（2）连接查询实验内容</h3><p>在学生课程数据库中:</p>
+<ol>
+<li><p>查询每个学生的情况以及他（她）所选修的课程。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017875.png" alt="image-20240511091918917"></p>
+</li>
+<li><p>求学生的学号、姓名、选修的课程名及成绩。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017876.png" alt="image-20240511092227294"></p>
+</li>
+<li><p>求选修C1课程且成绩为90分以上的学生学号、姓名及成绩<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017877.png" alt="image-20240511092425146"></p>
+</li>
+<li><p>查询每一门课的间接先行课（即先行课的先行课）<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017878.png" alt="image-20240511093432729"></p>
+</li>
+</ol>
+<h2 id="2、选择操作实验"><a href="#2、选择操作实验" class="headerlink" title="2、选择操作实验"></a>2、选择操作实验</h2><p>建立学生社团数据库和基本表，向库中输入一定的记录，并实现其数据的内连接和各种外查询操作。</p>
+<h4 id="1-建立学生社团数据库和基本表"><a href="#1-建立学生社团数据库和基本表" class="headerlink" title="1. 建立学生社团数据库和基本表"></a>1. 建立学生社团数据库和基本表</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE 学生社团数据库</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">USE 学生社团数据库</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 学生 (</span><br><span class="line">    学号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    姓名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    年龄 <span class="type">INT</span>,</span><br><span class="line">    性别 <span class="type">CHAR</span>(<span class="number">2</span>),</span><br><span class="line">    所在系 <span class="type">VARCHAR</span>(<span class="number">50</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 社团 (</span><br><span class="line">    社团编号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    社团名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 社团成员 (</span><br><span class="line">    学号 <span class="type">INT</span>,</span><br><span class="line">    社团编号 <span class="type">INT</span>,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (学号, 社团编号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (学号) <span class="keyword">REFERENCES</span> 学生(学号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (社团编号) <span class="keyword">REFERENCES</span> 社团(社团编号)</span><br><span class="line">);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017879.png" alt="image-20240517082435923"></li>
+</ul>
+<h4 id="2-输入数据记录"><a href="#2-输入数据记录" class="headerlink" title="2. 输入数据记录"></a>2. 输入数据记录</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;李明&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;张小红&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;李和明&#x27;</span>,<span class="number">22</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S4&#x27;</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;刘宏&#x27;</span>,<span class="number">23</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;张共可&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;物理&#x27;</span>)</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C1&#x27;</span>,<span class="string">&#x27;计算机协会&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C2&#x27;</span>,<span class="string">&#x27;英语俱乐部&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C3&#x27;</span>,<span class="string">&#x27;书画社&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C4&#x27;</span>,<span class="string">&#x27;话剧社&#x27;</span>)</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;C2&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;C3&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;C4&#x27;</span>)</span><br><span class="line">GO</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017880.png" alt="image-20240517082623049"></li>
+</ul>
+<p> <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017881.png" alt="image-20240517082655218"> </p>
+<p> <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017882.png" alt="image-20240517085347935"> </p>
+<h4 id="3-查询操作"><a href="#3-查询操作" class="headerlink" title="3. 查询操作"></a>3. 查询操作</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询1. 查询加入了编号为C1的社团的学生学号</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> 学号 <span class="keyword">FROM</span> 社团成员</span><br><span class="line"><span class="keyword">WHERE</span> 社团编号 <span class="operator">=</span> <span class="string">&#x27;C1&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017883.png" alt="image-20240517090458246"></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询2. 查询已加入社团的学生及其社团信息</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> 学生.姓名,社团.社团名 <span class="keyword">FROM</span> 学生,社团,社团成员</span><br><span class="line"><span class="keyword">WHERE</span> 学生.学号 <span class="operator">=</span> 社团成员.学号 <span class="keyword">AND</span> 社团.社团编号 <span class="operator">=</span> 社团成员.社团编号</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>命令执行结果：</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017884.png" alt="image-20240517090408402"></p>
+</li>
+</ul>
 ]]></content>
       <categories>
         <category>数据库</category>
@@ -479,83 +519,30 @@
       </categories>
   </entry>
   <entry>
-    <title>实验三-数据库简单查询和连接查询实验</title>
-    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%89-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%80%E5%8D%95%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
-    <content><![CDATA[<h1 id="实验三-数据库简单查询和连接查询实验"><a href="#实验三-数据库简单查询和连接查询实验" class="headerlink" title="实验三 数据库简单查询和连接查询实验"></a>实验三 数据库简单查询和连接查询实验</h1><h2 id="1、基本操作实验"><a href="#1、基本操作实验" class="headerlink" title="1、基本操作实验"></a>1、基本操作实验</h2><ul>
-<li><p>本实验的主要内容如下：<br>（1）简单查询操作。该实验包括投影、选择条件表达，数据排序，使用临时表等。<br>（2）连接查询操作。该实验包括等值连接、自然连接、求笛卡儿积、一般连接、外连接、内连接、左连接、右连接和自连接等。</p>
-</li>
-<li><p>实验题目和要求：<br>​		检查并修改学生课程库的效据，使之与表10-11至表10-13的数据一致；将下列查询要求用T-SQL语句表示；在SSMS的查询分析器中输人相应的T-SQL语句，执行并在结果区中查看内容；结果不正确时要对T-SQL语句修改，直到正确为止。</p>
-</li>
-</ul>
-<h3 id="（1）简单查询实验内容"><a href="#（1）简单查询实验内容" class="headerlink" title="（1）简单查询实验内容"></a>（1）简单查询实验内容</h3><p>在学生课程数据库中：</p>
-<ol>
-<li><p>求数学系学生的学号和姓名。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017868.png" alt="image-20240511085620338"></p>
-</li>
-<li><p>求选修了课程的学生学号。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017869.png" alt="image-20240511085940442"></p>
-</li>
-</ol>
-<ol start="3">
-<li><p>求选修C1课程的学生学号和成绩，并要求对查询结果按成绩的降序排列，如果成绩相同则按学号的升序排列。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017870.png" alt="image-20240511090359145"></p>
-</li>
-<li><p>求选修课程C1且成绩在80-90之间的学生学号和成续，将成绩乘以系数0.8输出。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017871.png" alt="image-20240511090810858"></p>
-</li>
-<li><p>求数学系或计算机系姓张的学生的信息。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017872.png" alt="image-20240511091027963"></p>
-</li>
-<li><p>求缺少了成绩的学生的学号和课程号<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017873.png" alt="image-20240511091214888"></p>
-</li>
-</ol>
-<h3 id="（2）连接查询实验内容"><a href="#（2）连接查询实验内容" class="headerlink" title="（2）连接查询实验内容"></a>（2）连接查询实验内容</h3><p>在学生课程数据库中:</p>
-<ol>
-<li><p>查询每个学生的情况以及他（她）所选修的课程。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017875.png" alt="image-20240511091918917"></p>
-</li>
-<li><p>求学生的学号、姓名、选修的课程名及成绩。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017876.png" alt="image-20240511092227294"></p>
-</li>
-<li><p>求选修C1课程且成绩为90分以上的学生学号、姓名及成绩<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017877.png" alt="image-20240511092425146"></p>
-</li>
-<li><p>查询每一门课的间接先行课（即先行课的先行课）<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017878.png" alt="image-20240511093432729"></p>
-</li>
-</ol>
-<h2 id="2、选择操作实验"><a href="#2、选择操作实验" class="headerlink" title="2、选择操作实验"></a>2、选择操作实验</h2><p>建立学生社团数据库和基本表，向库中输入一定的记录，并实现其数据的内连接和各种外查询操作。</p>
-<h4 id="1-建立学生社团数据库和基本表"><a href="#1-建立学生社团数据库和基本表" class="headerlink" title="1. 建立学生社团数据库和基本表"></a>1. 建立学生社团数据库和基本表</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE 学生社团数据库</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">USE 学生社团数据库</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 学生 (</span><br><span class="line">    学号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    姓名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    年龄 <span class="type">INT</span>,</span><br><span class="line">    性别 <span class="type">CHAR</span>(<span class="number">2</span>),</span><br><span class="line">    所在系 <span class="type">VARCHAR</span>(<span class="number">50</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 社团 (</span><br><span class="line">    社团编号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    社团名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 社团成员 (</span><br><span class="line">    学号 <span class="type">INT</span>,</span><br><span class="line">    社团编号 <span class="type">INT</span>,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (学号, 社团编号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (学号) <span class="keyword">REFERENCES</span> 学生(学号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (社团编号) <span class="keyword">REFERENCES</span> 社团(社团编号)</span><br><span class="line">);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017879.png" alt="image-20240517082435923"></li>
-</ul>
-<h4 id="2-输入数据记录"><a href="#2-输入数据记录" class="headerlink" title="2. 输入数据记录"></a>2. 输入数据记录</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;李明&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;张小红&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;李和明&#x27;</span>,<span class="number">22</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S4&#x27;</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;刘宏&#x27;</span>,<span class="number">23</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;张共可&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;物理&#x27;</span>)</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C1&#x27;</span>,<span class="string">&#x27;计算机协会&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C2&#x27;</span>,<span class="string">&#x27;英语俱乐部&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C3&#x27;</span>,<span class="string">&#x27;书画社&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C4&#x27;</span>,<span class="string">&#x27;话剧社&#x27;</span>)</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;C2&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;C3&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;C4&#x27;</span>)</span><br><span class="line">GO</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017880.png" alt="image-20240517082623049"></li>
-</ul>
-<p> <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017881.png" alt="image-20240517082655218"> </p>
-<p> <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017882.png" alt="image-20240517085347935"> </p>
-<h4 id="3-查询操作"><a href="#3-查询操作" class="headerlink" title="3. 查询操作"></a>3. 查询操作</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询1. 查询加入了编号为C1的社团的学生学号</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> 学号 <span class="keyword">FROM</span> 社团成员</span><br><span class="line"><span class="keyword">WHERE</span> 社团编号 <span class="operator">=</span> <span class="string">&#x27;C1&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017883.png" alt="image-20240517090458246"></li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询2. 查询已加入社团的学生及其社团信息</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> 学生.姓名,社团.社团名 <span class="keyword">FROM</span> 学生,社团,社团成员</span><br><span class="line"><span class="keyword">WHERE</span> 学生.学号 <span class="operator">=</span> 社团成员.学号 <span class="keyword">AND</span> 社团.社团编号 <span class="operator">=</span> 社团成员.社团编号</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>命令执行结果：</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017884.png" alt="image-20240517090408402"></p>
-</li>
-</ul>
+    <title>实验五-数据库的组合与统计查询实验</title>
+    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%BA%94-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E7%BB%84%E5%90%88%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
+    <content><![CDATA[<h1 id="实验五-数据库的组合与统计查询实验"><a href="#实验五-数据库的组合与统计查询实验" class="headerlink" title="实验五 数据库的组合与统计查询实验"></a>实验五 数据库的组合与统计查询实验</h1><h3 id="实验题目和要求："><a href="#实验题目和要求：" class="headerlink" title="实验题目和要求："></a>实验题目和要求：</h3><p>检查并修改图书读者库的数据，使之与表10-8至表10-10的数据一致；<br>检查并修改学生课程库的数据，便之与表10-11至表10-13的数据一致；<br>将下列查询要求用T-SQL语句表示；<br>在SSMS的查询分析器中输人相应的T-SQL语旬，执行并在结果区中查看内容；<br>结果不正确时要对T-SQL语句修改，直到正确为止。</p>
+<h3 id="1-在图书读者数据库中，按下列要求查询"><a href="#1-在图书读者数据库中，按下列要求查询" class="headerlink" title="(1) 在图书读者数据库中，按下列要求查询"></a>(1) 在图书读者数据库中，按下列要求查询</h3><p>​	1)查找图书类别，要求类别中最高图书定价不低于全部按类别分组的平均定价的2倍。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020912.png" alt="image-20240606230329833"></p>
+<p>​	2)求机械工业出版社出版的各类图书的平均定价，用GROUP BY表示。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020913.png" alt="image-20240531082608255"></p>
+<p>​	3)列出计算机类图书的书号、名称及价格，最后求出册数和总价格。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020914.png"></p>
+<p>​	4)列出计算机类图书的书号、名称及价格，并求出各出版社这类书的总价格，最后求出全部册数和总价格。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020915.png"></p>
+<p>​	5)查询计算机类和机械工业出版社出版的图书。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020916.png" alt="image-20240531090152465"></p>
+<h3 id="2-在学生课程数据库中，按下列要求查询"><a href="#2-在学生课程数据库中，按下列要求查询" class="headerlink" title="(2) 在学生课程数据库中，按下列要求查询"></a>(2) 在学生课程数据库中，按下列要求查询</h3><p>​	1)求学生的总人数。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020917.png" alt="image-20240531090441230"></p>
+<p>​	2)求选修了课程的学生人数。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020918.png" alt="image-20240531090657034"></p>
+<p>​	3)求课程和选修该课程的人数。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020919.png" alt="image-20240531091111076"></p>
+<p>​	4)求选修课超过3门课的学生学号。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020920.png" alt="image-20240531091326847"></p>
 ]]></content>
       <categories>
         <category>数据库</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>搭建Blog踩坑记录</title>
-    <url>/2024/07/25/%E6%90%AD%E5%BB%BABlog%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<h1 id="搭建Blog踩坑记录"><a href="#搭建Blog踩坑记录" class="headerlink" title="搭建Blog踩坑记录"></a>搭建Blog踩坑记录</h1><ul>
-<li>本地新添了博文，使用<code>hexo server</code>查看，一切正常。</li>
-<li><code>hexo d</code>，但显示<code>nothing to commit, working tree clean</code>？</li>
-<li>解决方法：<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo generate</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>踩坑记录</category>
       </categories>
   </entry>
   <entry>
@@ -602,6 +589,19 @@
 <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020402.png" alt="image-20240608200105572" style="zoom: 33%;" />]]></content>
       <categories>
         <category>数据库</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>搭建Blog踩坑记录</title>
+    <url>/2024/07/25/%E6%90%AD%E5%BB%BABlog%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<h1 id="搭建Blog踩坑记录"><a href="#搭建Blog踩坑记录" class="headerlink" title="搭建Blog踩坑记录"></a>搭建Blog踩坑记录</h1><ul>
+<li>本地新添了博文，使用<code>hexo server</code>查看，一切正常。</li>
+<li><code>hexo d</code>，但显示<code>nothing to commit, working tree clean</code>？</li>
+<li>解决方法：<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo generate</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>踩坑记录</category>
       </categories>
   </entry>
   <entry>
