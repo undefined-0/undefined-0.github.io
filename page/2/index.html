@@ -150,6 +150,610 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/22/AT89S52-test5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/22/AT89S52-test5/" class="post-title-link" itemprop="url">AT89S52_test5</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-07-22 14:45:43 / 修改时间：14:53:31" itemprop="dateCreated datePublished" datetime="2024-07-22T14:45:43+08:00">2024-07-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AT89S52/" itemprop="url" rel="index"><span itemprop="name">AT89S52</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="实验五-计数器实验"><a href="#实验五-计数器实验" class="headerlink" title="实验五 计数器实验"></a>实验五 计数器实验</h2><h3 id="test-5-1"><a href="#test-5-1" class="headerlink" title="test 5_1"></a>test 5_1</h3><p>采用定时器与计数器相结合的方法使P1.7所接的发光二极管亮1秒、灭1秒，周而复始。<br>用三种组合实现：①查询方式+中断方式；②查询方式+查询方式；③中断方式+中断方式。</p>
+<p>接线方法：P1.7接一LED，P3.5（T1输入）接P1.0（周期为100ms的方波输出）</p>
+<p>①查询方式+中断方式<br>T1计数10，T0计时50ms<br>T1采用查询，T0采用中断</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 ;SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	</span><br><span class="line">	CHECK: 			;查询T1是否有中断溢出请求</span><br><span class="line">	JBC TF1,HANDLE	;若中断请求标志位TF1为1，则将其清零并跳转到处理程序</span><br><span class="line">	SJMP CHECK</span><br><span class="line">	</span><br><span class="line">	HANDLE:			;若T1有中断溢出请求，则取反P1.7</span><br><span class="line">	CPL P1.7</span><br><span class="line">	SJMP CHECK</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI	</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-2"><a href="#test-5-2" class="headerlink" title="test 5_2"></a>test 5_2</h3><p>②查询方式+查询方式<br>T1、T0皆采用查询</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	 ORG 0030H</span><br><span class="line">	 MAIN:</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 SETB P1.0 ;设P1.0初始为高电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB TR1 ;启动T1（定时）</span><br><span class="line">	 </span><br><span class="line">	 LABEL1:</span><br><span class="line">	 CPL P1.7</span><br><span class="line">	 </span><br><span class="line">	 LABEL2:</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 SETB TR0 ;启动T0（计数）</span><br><span class="line">	 </span><br><span class="line">	 LABEL3:</span><br><span class="line">	 JBC TF0,LABEL4 ;若50ms到了，则将中断请求标志位TF0清零并跳转LABEL4（翻转P1.0）</span><br><span class="line">	 SJMP LABEL3 ;50ms未到，继续查询中断请求标志位TF0状态</span><br><span class="line">	 </span><br><span class="line">	 LABEL4:</span><br><span class="line">	 CPL P1.0</span><br><span class="line">	 JBC TF1,LABEL1 ;若1s到了，则将中断请求标志位TF1清零并跳转LABEL1（翻转P1.7）</span><br><span class="line">	 AJMP LABEL2 ;某一个50ms到了，但1s没到，回到LABEL2对T0进行重装载</span><br><span class="line">	</span><br><span class="line">	 END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-3"><a href="#test-5-3" class="headerlink" title="test 5_3"></a>test 5_3</h3><p>③中断方式+中断方式<br>T1、T0皆采用中断</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	CPL P1.7</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-4"><a href="#test-5-4" class="headerlink" title="test 5_4"></a>test 5_4</h3><p>输入计数脉冲，将计数脉冲的个数显示出来（小于15次），循环往复<br>接线方法：P1口接八个LED，P3.5（T1输入）接按钮（按下一次，产生一个脉冲）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">;采用T1进行计数</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV TMOD,#60H ;0110 0000：设置T1为计数器，方式2</span><br><span class="line">	 MOV TH1,#0FFH ;按下一次按钮，进入一次中断</span><br><span class="line">	 MOV TL1,#0FFH</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	 CJNE A,#0FH,INCA ;若脉冲个数未到15个，则A直接加1</span><br><span class="line">	 MOV A,#0 ;若脉冲个数已到15个，则从零开始计数</span><br><span class="line">INCA:INC A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">     RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/22/AT89S52-test4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/22/AT89S52-test4/" class="post-title-link" itemprop="url">AT89S52_test4</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-22 14:40:52" itemprop="dateCreated datePublished" datetime="2024-07-22T14:40:52+08:00">2024-07-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-07-24 20:17:32" itemprop="dateModified" datetime="2024-07-24T20:17:32+08:00">2024-07-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AT89S52/" itemprop="url" rel="index"><span itemprop="name">AT89S52</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="实验四-定时器实验"><a href="#实验四-定时器实验" class="headerlink" title="实验四 定时器实验"></a>实验四 定时器实验</h2><p>注：本实验所用单片机外接晶振频率为11.059MHz</p>
+<h3 id="test-4-1"><a href="#test-4-1" class="headerlink" title="test 4_1"></a>test 4_1</h3><p>采用定时器控制从P1.0口输出1000Hz方波信号，占空比为1&#x2F;4。</p>
+<p>接线方法：P1.0接示波器红表笔，任找一低电平接黑表笔。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	CLR P1.0 ;设P1.0、P1.1初始为低电平</span><br><span class="line">	MOV TMOD,11H ;0000 0001：设置T0为定时器，工作在方式1</span><br><span class="line">	MOV TH0,#0FFH ;开启后立即进入中断</span><br><span class="line">	MOV TL0,#0FEH</span><br><span class="line">	SETB ET0 ;允许T0中断</span><br><span class="line">	SETB TR0 ;启动T0</span><br><span class="line">	SETB EA ;开中断总开关</span><br><span class="line">	SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">    CLR TR0 ;停止T0</span><br><span class="line">    CPL P1.0 ;反转P1.0</span><br><span class="line">    JNB P1.0, T0_CHANGE_TIME ;如果P1.0为低电平，设置T0为低电平持续时间</span><br><span class="line">    MOV TH0, #0FFH ;重装载（250μs，高电平持续时间）</span><br><span class="line">    MOV TL0, #01AH</span><br><span class="line">    SETB TR0;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T0_CHANGE_TIME:</span><br><span class="line">    MOV TH0, #0FDH ;重装载（750μs，低电平持续时间）</span><br><span class="line">    MOV TL0, #4DH</span><br><span class="line">    SETB TR0 ;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-4-2"><a href="#test-4-2" class="headerlink" title="test 4_2"></a>test 4_2</h3><p>采用定时器控制从P1.0和P1.1分别输出周期为3ms占空比为1&#x2F;3的方波和周期为为500μs占空比为1&#x2F;5的方波。</p>
+<p>接线方法：P1.0接示波器红表笔（CH1），任找一低电平接黑表笔<br>                  P1.1接示波器红表笔（CH2），任找一低电平接黑表笔</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0050H</span><br><span class="line">	MAIN:</span><br><span class="line">	CLR P1.0 ;设P1.0、P1.1初始为低电平</span><br><span class="line">    CLR P1.1</span><br><span class="line">	MOV TMOD,#11H ;0001 0001：设置T1、T0都为定时器，都工作在方式1</span><br><span class="line">	MOV TH0,#0FFH ;开启后立即进入中断</span><br><span class="line">	MOV TL0,#0FEH</span><br><span class="line">	MOV TH1,#0FFH</span><br><span class="line">	MOV TL1,#0FEH</span><br><span class="line">	SETB ET0 ;允许T0中断</span><br><span class="line">	SETB ET1 ;允许T1中断</span><br><span class="line">	SETB TR0 ;启动T0</span><br><span class="line">	SETB TR1 ;启动T1</span><br><span class="line">	SETB EA ;开中断总开关</span><br><span class="line">	SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">    CLR TR0 ;停止T0</span><br><span class="line">    CPL P1.0 ;反转P1.0</span><br><span class="line">    JNB P1.0, T0_CHANGE_TIME ;如果P1.0为低电平，设置T0为低电平持续时间</span><br><span class="line">    MOV TH0, #0FCH ;重装载（1ms，高电平持续时间）</span><br><span class="line">    MOV TL0, #066H</span><br><span class="line">    SETB TR0;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T0_CHANGE_TIME:</span><br><span class="line">    MOV TH0, #0F8H ;重装载（2ms，低电平持续时间）</span><br><span class="line">    MOV TL0, #0CDH</span><br><span class="line">    SETB TR0 ;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	T1_ISR:</span><br><span class="line">    CLR TR1 ;停止T1</span><br><span class="line">    CPL P1.1 ;反转P1.1</span><br><span class="line">    JNB P1.1, T1_CHANGE_TIME ;如果P1.1为低电平，设置T1为低电平持续时间</span><br><span class="line">    MOV TH1, #0FFH ;重装载（100μs，高电平持续时间）</span><br><span class="line">    MOV TL1, #0A4H</span><br><span class="line">    SETB TR1;重新启动T1</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T1_CHANGE_TIME:</span><br><span class="line">    MOV TH1, #0FEH ;重装载（400μs，低电平持续时间）</span><br><span class="line">    MOV TL1, #8FH</span><br><span class="line">    SETB TR1 ;重新启动T1</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<p>来自其他人的一种更好的写法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">;采用定时器控制从P1.0和P1.1分别输出周期为3ms占空比为1/3的方波和周期为500微秒占空比为1/5的方波。</span><br><span class="line">;11.0592MHz，1.085069微秒</span><br><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 000BH</span><br><span class="line">AJMP TIMER0_ISR</span><br><span class="line">ORG 001BH</span><br><span class="line">AJMP TIMER1_ISR</span><br><span class="line">ORG 0100H</span><br><span class="line">MAIN:MOV TMOD, #00010010H ; 设置定时器0为模式1、定时器1为模式2 (16位定时器、8位定时器)</span><br><span class="line">    MOV TH0, #0FCH        ; 设置定时器0初始值 (1ms)</span><br><span class="line">    MOV TL0, #03FH</span><br><span class="line">    MOV TH1, #0A4H        ; 设置定时器1初始值 (100微秒)</span><br><span class="line">    MOV TL1, #0A4H</span><br><span class="line">    MOV R0, #2            ; 计数2（低电平2ms）</span><br><span class="line">    MOV R1, #4            ; 计数4（低电平400微秒）</span><br><span class="line">    CLR P1.0              ; 低电平</span><br><span class="line">    CLR P1.1              ; 低电平</span><br><span class="line">    SETB ET0              ; 使能定时器0中断</span><br><span class="line">    SETB ET1              ; 使能定时器1中断</span><br><span class="line">    SETB EA               ; 使能全局中断</span><br><span class="line">    SETB TR0              ; 启动定时器0</span><br><span class="line">    SETB TR1              ; 启动定时器1</span><br><span class="line">LOOP: SJMP LOOP           ; 无限循环</span><br><span class="line"></span><br><span class="line">TIMER0_ISR: MOV TH0, #0FCH       ; 重装载定时器0初始值</span><br><span class="line">            MOV TL0, #03FH</span><br><span class="line">            DJNZ R0, EXIT        ; R0=0 P1.0=1 </span><br><span class="line">            CPL P1.0</span><br><span class="line">            JB P1.0, CYCLE1      ; P1.0=1-&gt;CYCLE1&amp;P1.0=0-&gt;R0=2</span><br><span class="line">            MOV R0, #2             </span><br><span class="line">            SJMP EXIT</span><br><span class="line">CYCLE1: MOV R0, #1</span><br><span class="line">        SJMP EXIT</span><br><span class="line"></span><br><span class="line">TIMER1_ISR: MOV TH1, #0A4H       ; 重装载定时器1初始值</span><br><span class="line">            MOV TL1, #0A4H</span><br><span class="line">            DJNZ R1, EXIT        ; R1=0 P1.0=1 </span><br><span class="line">            CPL P1.1</span><br><span class="line">            JB P1.1, CYCLE2      ; P1.1=1-&gt;CYCLE2&amp;P1.1=0-&gt;R1=4</span><br><span class="line">            MOV R1, #4           </span><br><span class="line">            SJMP EXIT</span><br><span class="line">CYCLE2: MOV R1, #1 </span><br><span class="line">        SJMP EXIT</span><br><span class="line">        </span><br><span class="line">EXIT:RETI</span><br><span class="line">     END</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/22/AT89S52-test3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/22/AT89S52-test3/" class="post-title-link" itemprop="url">AT89S52_test3</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-07-22 09:27:34 / 修改时间：14:40:56" itemprop="dateCreated datePublished" datetime="2024-07-22T09:27:34+08:00">2024-07-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AT89S52/" itemprop="url" rel="index"><span itemprop="name">AT89S52</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="实验三-外部中断实验"><a href="#实验三-外部中断实验" class="headerlink" title="实验三 外部中断实验"></a>实验三 外部中断实验</h2><h3 id="test-3-1"><a href="#test-3-1" class="headerlink" title="test 3_1"></a>test 3_1</h3><p>通过外部中断使P1口的开关控制8个发光二极管，开始是P1.0所接的灯亮，以后每中断一次，下一个灯亮，顺序左移，周而复始。</p>
+<p>接线方法：P0口接8个LED，P3.2接信号发生器（输出方波）红表笔，任找一低电平接黑表笔</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FEH </span><br><span class="line">MOV P1,A ;P1.0所接的灯亮</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">SJMP $</span><br><span class="line">INTERRUPT1:</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">RETI</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-3-2"><a href="#test-3-2" class="headerlink" title="test 3_2"></a>test 3_2</h3><p>外部中断控制P1口连接的8个发光二极管，同时亮，或同时灭，每中断一次，变反一次</p>
+<p>接线方法：P1口接8个LED，P3.2接信号发生器（输出方波）红表笔，任找一低电平接黑表笔</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH </span><br><span class="line">MOV P1,A ;开始灯全灭</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">SJMP $</span><br><span class="line">INTERRUPT1:</span><br><span class="line">CPL A</span><br><span class="line">MOV P1,A</span><br><span class="line">RETI</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-3-3"><a href="#test-3-3" class="headerlink" title="test 3_3"></a>test 3_3</h3><p>外部中断控制P1口连接的8个发光二极管。<br>中断第一次，8个发光二极管循环点亮；<br>中断第二次，8个发光二极管逐个点亮；<br>中断第三次，8个发光二极管高四位和低四位交替亮灭。<br>如此循环往复。</p>
+<p>接线方法：P1口接8个LED，P3.2接按键</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">	</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">	</span><br><span class="line">ORG 0030H</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH</span><br><span class="line">MOV P1,A ;开始灯全灭</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">RELOAD:MOV R3,#03H ;计数变量</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A ;点亮P1.0所接的灯</span><br><span class="line">	</span><br><span class="line">LOOP0:</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#03,LOOP1</span><br><span class="line">SJMP LOOP0</span><br><span class="line">	</span><br><span class="line">LOOP1:</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A</span><br><span class="line">MOV R4,#00H</span><br><span class="line">ACALL DELAY</span><br><span class="line">LOOP11:</span><br><span class="line">ADD A,ACC</span><br><span class="line">MOV P1,A</span><br><span class="line">INC R4 ;计算是否满8次</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#02,LOOP2</span><br><span class="line">CJNE R4,#08H,LOOP11 ;不满8次，继续逐个点亮</span><br><span class="line">SJMP LOOP1 ;满8次，重新从全灭开始逐个点亮</span><br><span class="line">	</span><br><span class="line">LOOP2:</span><br><span class="line">MOV A,#0FH</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CPL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#01,RELOAD</span><br><span class="line">SJMP LOOP2</span><br><span class="line">	</span><br><span class="line">INTERRUPT1:</span><br><span class="line">DEC R3 ;R3减一</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">DELAY: MOV R0,#0AH</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$ </span><br><span class="line">DJNZ R1,DELAY2 </span><br><span class="line">DJNZ R0,DELAY1 </span><br><span class="line">RET</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/22/AT89S52-test2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/22/AT89S52-test2/" class="post-title-link" itemprop="url">AT89S52_test2</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-07-22 09:17:24 / 修改时间：09:26:24" itemprop="dateCreated datePublished" datetime="2024-07-22T09:17:24+08:00">2024-07-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AT89S52/" itemprop="url" rel="index"><span itemprop="name">AT89S52</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="实验二-并行接口输入输出实验"><a href="#实验二-并行接口输入输出实验" class="headerlink" title="实验二 并行接口输入输出实验"></a>实验二 并行接口输入输出实验</h2><h3 id="test-2-1"><a href="#test-2-1" class="headerlink" title="test 2_1"></a>test 2_1</h3><p>选用输出口接八只发光二极管，编写程序，使发光二极管循环点亮（采用软件延时）<br>接线方法：使用P1口连接LED</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">LOOP:</span><br><span class="line">MOV P1,A ;点亮P1.0连接的LED</span><br><span class="line">LCALL DELAY</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">SJMP LOOP</span><br><span class="line"></span><br><span class="line"> DELAY: MOV R0,#0AH ;延时子程序(延时时间约1秒)</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$</span><br><span class="line">DJNZ R1,DELAY2</span><br><span class="line">DJNZ R0,DELAY1</span><br><span class="line">RET</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-2-2"><a href="#test-2-2" class="headerlink" title="test 2_2"></a>test 2_2</h3><p>采用一个输入口和一个输出口，将开关的状态反映在发光二极管上<br>接线方法：P1口接开关，P0口接LED</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">LOOP:</span><br><span class="line">ORL P1,#0FFH ;读P1口之前先对其写1</span><br><span class="line">MOV A,P1 ;将P1口状态（按键状态）读入A</span><br><span class="line">MOV P0,A ;将按键状态送至P0，使其在LED上反映出来</span><br><span class="line">SJMP LOOP</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/07/22/AT89S52-test1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/22/AT89S52-test1/" class="post-title-link" itemprop="url">AT89S52_test1</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-22 09:01:19" itemprop="dateCreated datePublished" datetime="2024-07-22T09:01:19+08:00">2024-07-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-07-24 20:33:53" itemprop="dateModified" datetime="2024-07-24T20:33:53+08:00">2024-07-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AT89S52/" itemprop="url" rel="index"><span itemprop="name">AT89S52</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="写在最前面"><a href="#写在最前面" class="headerlink" title="写在最前面"></a>写在最前面</h2><p>本分类内使用的单片机皆为AT89S52，外接晶振频率为11.059MHz。</p>
+<h2 id="实验一-验证实验"><a href="#实验一-验证实验" class="headerlink" title="实验一 验证实验"></a>实验一 验证实验</h2><h3 id="test-1-1"><a href="#test-1-1" class="headerlink" title="test 1_1"></a>test 1_1</h3><p>将外部数据存储器0000H-0010H中的内容传送到片内数据存储器60H-70H单元。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV DPTR,#0000H</span><br><span class="line">MOV R0,#60H</span><br><span class="line">LOOP:</span><br><span class="line">MOVX A,@DPTR</span><br><span class="line">MOVX @R0,A</span><br><span class="line">INC DPTR</span><br><span class="line">INC R0</span><br><span class="line">CJNE R0 ,#71H,LOOP</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-1-2"><a href="#test-1-2" class="headerlink" title="test 1_2"></a>test 1_2</h3><p>程序跳转表</p>
+<p>(1)运行程序,打开数据窗口,观察地址 30H、31H、32H、33H的数据变化。用键盘输入改变地址 30H、31H、32H、33H 的值，观察其实验效果。修改源程序中给30H~33H的赋值，观察实验效果。</p>
+<p>(2)打开CPU窗口，选择单步或跟踪执行方式运行程序，观察CPU窗口各寄存器的变化。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">ORG 0</span><br><span class="line">LJMP START // 改动此处，改变的是赋值</span><br><span class="line">FUNC0:MOV 30H,#0</span><br><span class="line">RET</span><br><span class="line">FUNC1:MOV 31H,#1</span><br><span class="line">RET</span><br><span class="line">FUNC2:MOV 32H,#2</span><br><span class="line">RET</span><br><span class="line">FUNC3:MOV 33H,#3</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">FUNCENTER:</span><br><span class="line">ADD A,ACC // AJMP是一个2字节指令，故A需要乘以2，使得程序在JMP指令中跳转到正确的位置</span><br><span class="line">MOV DPTR,#FUNCTAB</span><br><span class="line">JMP @A+DPTR</span><br><span class="line"></span><br><span class="line">FUNCTAB:</span><br><span class="line">AJMP FUNC0</span><br><span class="line">AJMP FUNC1</span><br><span class="line">AJMP FUNC2</span><br><span class="line">AJMP FUNC3</span><br><span class="line"></span><br><span class="line">START:</span><br><span class="line">MOV A,#0</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#1</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#2</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#3</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">LJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-1-3"><a href="#test-1-3" class="headerlink" title="test 1_3"></a>test 1_3</h3><h4 id="test1-3-1"><a href="#test1-3-1" class="headerlink" title="test1_3_1"></a>test1_3_1</h4><p>教材第55页5题。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#56H</span><br><span class="line">ADD A,#74H ; CAH+CAH = 194H，高位舍弃</span><br><span class="line">ADD A,ACC</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h4 id="test1-3-2"><a href="#test1-3-2" class="headerlink" title="test1_3_2"></a>test1_3_2</h4><p>教材第55页7题。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV 59H,#50H</span><br><span class="line">MOV A,59H</span><br><span class="line">MOV R0,A</span><br><span class="line">MOV A,#0</span><br><span class="line">MOV @R0,A</span><br><span class="line">MOV A,#25H</span><br><span class="line">MOV 51H,A</span><br><span class="line">MOV 52H,#70H</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h4 id="test1-3-3"><a href="#test1-3-3" class="headerlink" title="test1_3_3"></a>test1_3_3</h4><p>教材第55页8题。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV SP,#60H</span><br><span class="line">MOV 30H,#24H</span><br><span class="line">MOV 31H,#10H</span><br><span class="line">PUSH 30H</span><br><span class="line">PUSH 31H</span><br><span class="line">POP DPL</span><br><span class="line">POP DPH</span><br><span class="line">MOV A,#00H</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">SJMP $</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/30/%E5%AE%9E%E9%AA%8C%E4%B8%80-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%9A%E4%B9%89%E5%AE%9E%E9%AA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/06/30/%E5%AE%9E%E9%AA%8C%E4%B8%80-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%9A%E4%B9%89%E5%AE%9E%E9%AA%8C/" class="post-title-link" itemprop="url">实验一_数据库定义实验</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-30 19:30:21" itemprop="dateCreated datePublished" datetime="2024-06-30T19:30:21+08:00">2024-06-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-06-23 09:59:41" itemprop="dateModified" datetime="2025-06-23T09:59:41+08:00">2025-06-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="实验一-数据库定义实验"><a href="#实验一-数据库定义实验" class="headerlink" title="实验一 数据库定义实验"></a>实验一 数据库定义实验</h1><h2 id="1-基本操作实验："><a href="#1-基本操作实验：" class="headerlink" title="1. 基本操作实验："></a>1. 基本操作实验：</h2><h3 id="1）课本p286-10-4-1-基本操作实验内容"><a href="#1）课本p286-10-4-1-基本操作实验内容" class="headerlink" title="1）课本p286 10.4.1 基本操作实验内容"></a>1）课本p286 10.4.1 基本操作实验内容</h3><ul>
+<li>使用Management Studio创建图书读者数据库及学生课程数据库。</li>
+</ul>
+<p>学生课程数据库的表结构为：<br>​		学生（学号，姓名，年龄，性别，所在系）；<br>​		课程（课程号，课程名，先行课）；<br>​		选课（学号，课程号，成绩）；</p>
+<p>图书读者数据库表结构为：<br>        图书（书号，类别，出版社，作者，书名，定价）；<br>        读者（编号，姓名，单位，性别，电话）；<br>        借阅（书号，读者编号，借阅日期）；</p>
+<ul>
+<li><p>实验结果截图：</p>
+<ul>
+<li>数据库创建：</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957105.png" alt="image-20240510090837905"></p>
+<ul>
+<li>学生课程数据库的表结构：</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957106.png" alt="image-20240510091339291"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957107.png" alt="image-20240510091307613"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957108.png" alt="image-20240510091359025"></p>
+<ul>
+<li>图书读者数据库的表结构：</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957109.png" alt="image-20240510090936973"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957110.png" alt="image-20240510091441925"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957111.png" alt="image-20240510091506765"></p>
+</li>
+</ul>
+<h3 id="2）-设定每个表的主码。"><a href="#2）-设定每个表的主码。" class="headerlink" title="2） 设定每个表的主码。"></a>2） 设定每个表的主码。</h3><ul>
+<li><p>实验结果：</p>
+<table>
+<thead>
+<tr>
+<th>表</th>
+<th>主码</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>学生</td>
+<td>学号</td>
+</tr>
+<tr>
+<td>课程</td>
+<td>课程号</td>
+</tr>
+<tr>
+<td>选课</td>
+<td>学号、课程号</td>
+</tr>
+<tr>
+<td>图书</td>
+<td>书号</td>
+</tr>
+<tr>
+<td>读者</td>
+<td>编号</td>
+</tr>
+<tr>
+<td>借阅</td>
+<td>书号、读者编号</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="3）-在Management-Studio中建立学生表、课程表和选课表的表级约束。（外码）。"><a href="#3）-在Management-Studio中建立学生表、课程表和选课表的表级约束。（外码）。" class="headerlink" title="3） 在Management Studio中建立学生表、课程表和选课表的表级约束。（外码）。"></a>3） 在Management Studio中建立学生表、课程表和选课表的表级约束。（外码）。</h3><ul>
+<li><p>实验结果：</p>
+<table>
+<thead>
+<tr>
+<th>表</th>
+<th>外码字段</th>
+<th>参照字段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dbo.选课</td>
+<td>学号</td>
+<td>dbo.学生 - 学号</td>
+</tr>
+<tr>
+<td>dbo.选课</td>
+<td>课程号</td>
+<td>dbo.课程 - 课程号</td>
+</tr>
+<tr>
+<td>dbo.借阅</td>
+<td>书号</td>
+<td>dbo.图书 - 书号</td>
+</tr>
+<tr>
+<td>dbo.借阅</td>
+<td>读者编号</td>
+<td>dbo.读者 - 编号</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="4）-通过Management-Studio实现对上述三个表中数据的增加、删除和修改。"><a href="#4）-通过Management-Studio实现对上述三个表中数据的增加、删除和修改。" class="headerlink" title="4） 通过Management Studio实现对上述三个表中数据的增加、删除和修改。"></a>4） 通过Management Studio实现对上述三个表中数据的增加、删除和修改。</h3><ul>
+<li><p>增加：<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957112.png" alt="image-20240510152324808"></p>
+</li>
+<li><p>删除：<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957113.png" alt="image-20240510152615348"></p>
+<p>删除后：<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957114.png" alt="image-20240510152650427"></p>
+<ul>
+<li><p>修改：<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957115.png" alt="image-20240510152820025"></p>
+<p>修改后：<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957116.png" alt="image-20240510152852125"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-提高操作实验："><a href="#2-提高操作实验：" class="headerlink" title="2. 提高操作实验："></a>2. 提高操作实验：</h2><h3 id="1）-使用SQL命令重新创建以上三个基本表。"><a href="#1）-使用SQL命令重新创建以上三个基本表。" class="headerlink" title="1） 使用SQL命令重新创建以上三个基本表。"></a>1） 使用SQL命令重新创建以上三个基本表。</h3><h3 id="2）-选择合适的数据类型；"><a href="#2）-选择合适的数据类型；" class="headerlink" title="2） 选择合适的数据类型；"></a>2） 选择合适的数据类型；</h3><h3 id="3）-定义必要的索引，表级约束和列级约束。"><a href="#3）-定义必要的索引，表级约束和列级约束。" class="headerlink" title="3） 定义必要的索引，表级约束和列级约束。"></a>3） 定义必要的索引，表级约束和列级约束。</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--创建学生课程数据库</span></span><br><span class="line"><span class="keyword">CREATE</span> DATABASE 学生课程数据库;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">USE 学生课程数据库;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 学生 (</span><br><span class="line">    学号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    姓名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    年龄 <span class="type">INT</span>,</span><br><span class="line">    性别 <span class="type">CHAR</span>(<span class="number">2</span>),</span><br><span class="line">    所在系 <span class="type">VARCHAR</span>(<span class="number">50</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 课程 (</span><br><span class="line">    课程号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    课程名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    先行课 <span class="type">NCHAR</span>(<span class="number">4</span>),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (先行课) <span class="keyword">REFERENCES</span> 课程(课程号)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 选课 (</span><br><span class="line">    学号 <span class="type">INT</span>,</span><br><span class="line">    课程号 <span class="type">INT</span>,</span><br><span class="line">    成绩 <span class="type">DECIMAL</span>(<span class="number">5</span>, <span class="number">2</span>),</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (学号, 课程号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (学号) <span class="keyword">REFERENCES</span> 学生(学号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (课程号) <span class="keyword">REFERENCES</span> 课程(课程号)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957117.png" alt="image-20240510093550622"></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--创建图书读者数据库</span></span><br><span class="line"><span class="keyword">CREATE</span> DATABASE 图书读者数据库;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">USE 图书读者数据库;</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 图书 (</span><br><span class="line">    书号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    类别 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    出版社 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    作者 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    书名 <span class="type">VARCHAR</span>(<span class="number">100</span>),</span><br><span class="line">    定价 <span class="type">DECIMAL</span>(<span class="number">10</span>, <span class="number">2</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 读者 (</span><br><span class="line">    编号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    姓名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    单位 <span class="type">VARCHAR</span>(<span class="number">100</span>),</span><br><span class="line">    性别 <span class="type">CHAR</span>(<span class="number">2</span>),</span><br><span class="line">    电话 <span class="type">VARCHAR</span>(<span class="number">20</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 借阅 (</span><br><span class="line">    书号 <span class="type">INT</span>,</span><br><span class="line">    读者编号 <span class="type">INT</span>,</span><br><span class="line">    借阅日期 <span class="type">DATE</span>,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (书号, 读者编号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (书号) <span class="keyword">REFERENCES</span> 图书(书号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (读者编号) <span class="keyword">REFERENCES</span> 读者(编号)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br>  <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957118.png" alt="image-20240510093441056"></li>
+</ul>
+<h2 id="3-选择操作实验："><a href="#3-选择操作实验：" class="headerlink" title="3.选择操作实验："></a>3.选择操作实验：</h2><ul>
+<li><p>自行设计一个数据库小系统，并通过SQL命令和SQL SERVER Management Studio在计算机上实现建库、建表、建立表间联系和必要的索引和约束。</p>
+<h4 id="医院信息数据库："><a href="#医院信息数据库：" class="headerlink" title="医院信息数据库："></a>医院信息数据库：</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--创建医院信息数据库</span></span><br><span class="line"><span class="keyword">CREATE</span> DATABASE 医院信息数据库</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">USE 医院信息数据库</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 医生 (</span><br><span class="line">    工号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    姓名 <span class="type">VARCHAR</span>(<span class="number">100</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    年龄 <span class="type">INT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    性别 <span class="type">CHAR</span>(<span class="number">2</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    职称 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    科室 <span class="type">VARCHAR</span>(<span class="number">100</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 患者 (</span><br><span class="line">    患者号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    姓名 <span class="type">VARCHAR</span>(<span class="number">100</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    年龄 <span class="type">INT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    性别 <span class="type">CHAR</span>(<span class="number">2</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    身份证号码 NVARCHAR(<span class="number">18</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">UNIQUE</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 病历 (</span><br><span class="line">    病历号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    患者号 <span class="type">INT</span>,</span><br><span class="line">    医生工号 <span class="type">INT</span>,</span><br><span class="line">    就诊日期 <span class="type">DATE</span>,</span><br><span class="line">    病情描述 TEXT,</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (患者号) <span class="keyword">REFERENCES</span> 患者(患者号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (医生工号) <span class="keyword">REFERENCES</span> 医生(工号)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957119.png" alt="image-20240510152021435"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/30/HelloWorld/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -181,17 +785,8 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-06-23 10:35:57" itemprop="dateModified" datetime="2025-06-23T10:35:57+08:00">2025-06-23</time>
+                <time title="修改时间：2025-06-23 11:02:38" itemprop="dateModified" datetime="2025-06-23T11:02:38+08:00">2025-06-23</time>
               </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
 
           
 
@@ -295,7 +890,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

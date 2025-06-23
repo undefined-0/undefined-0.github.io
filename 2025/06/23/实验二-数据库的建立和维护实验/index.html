@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-leaf.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-leaf.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="实验二 数据库的建立和维护实验一、实验目的：​    要求学生熟练掌握使用SQL命令和SQL Server Management Studio向数据库输入数据、修改数据和删除数据的操作。 二、实验内容：1、基本操作实验 按照书上10.4.2的要求完成基本操作实验和提高操作实验。要求:在每个基本表中各输入至少10条记录,能使用SQL命令进行数据输入、修改和删除操作。  (1)通过SQL Server">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实验二-数据库的建立和维护实验">
+<meta property="og:url" content="http://example.com/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%BA%8C-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%BB%BA%E7%AB%8B%E5%92%8C%E7%BB%B4%E6%8A%A4%E5%AE%9E%E9%AA%8C/index.html">
+<meta property="og:site_name" content="undefined-0&#39;s Blog">
+<meta property="og:description" content="实验二 数据库的建立和维护实验一、实验目的：​    要求学生熟练掌握使用SQL命令和SQL Server Management Studio向数据库输入数据、修改数据和删除数据的操作。 二、实验内容：1、基本操作实验 按照书上10.4.2的要求完成基本操作实验和提高操作实验。要求:在每个基本表中各输入至少10条记录,能使用SQL命令进行数据输入、修改和删除操作。  (1)通过SQL Server">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446438272292939279">
+<meta property="og:image" content="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446447656922272993">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017734.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017735.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017736.png">
+<meta property="og:image" content="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446445473677989072">
+<meta property="og:image" content="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446445893007725782">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017737.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017738.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017739.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017740.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017741.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017742.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017743.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017744.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017745.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017746.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017747.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017748.png">
+<meta property="article:published_time" content="2025-06-23T02:49:49.000Z">
+<meta property="article:modified_time" content="2025-06-23T02:55:47.168Z">
+<meta property="article:author" content="undefined-0">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446438272292939279">
+
+<link rel="canonical" href="http://example.com/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%BA%8C-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%BB%BA%E7%AB%8B%E5%92%8C%E7%BB%B4%E6%8A%A4%E5%AE%9E%E9%AA%8C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>实验二-数据库的建立和维护实验 | undefined-0's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">undefined-0's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">历添新岁月 春满旧山河</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%BA%8C-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%BB%BA%E7%AB%8B%E5%92%8C%E7%BB%B4%E6%8A%A4%E5%AE%9E%E9%AA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          实验二-数据库的建立和维护实验
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-06-23 10:49:49 / 修改时间：10:55:47" itemprop="dateCreated datePublished" datetime="2025-06-23T10:49:49+08:00">2025-06-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="实验二-数据库的建立和维护实验"><a href="#实验二-数据库的建立和维护实验" class="headerlink" title="实验二 数据库的建立和维护实验"></a>实验二 数据库的建立和维护实验</h1><h2 id="一、实验目的："><a href="#一、实验目的：" class="headerlink" title="一、实验目的："></a><strong>一、实验目的</strong>：</h2><p>​    要求学生熟练掌握使用SQL命令和SQL Server Management Studio向数据库输入数据、修改数据和删除数据的操作。</p>
+<h2 id="二、实验内容："><a href="#二、实验内容：" class="headerlink" title="二、实验内容："></a><strong>二、实验内容：</strong></h2><h3 id="1、基本操作实验"><a href="#1、基本操作实验" class="headerlink" title="1、基本操作实验"></a>1、基本操作实验</h3><ul>
+<li>按照书上10.4.2的要求完成基本操作实验和提高操作实验。要求:在每个基本表中各输入至少10条记录,能使用SQL命令进行数据输入、修改和删除操作。</li>
+</ul>
+<h4 id="1-通过SQL-Server-Management-Studio，向图书-读者库中的图书、读者和借阅3个表输入记录。数据记录内容如表10-8-表10-10所示-序号项是为了查看方便，实际数据不含序号项-。"><a href="#1-通过SQL-Server-Management-Studio，向图书-读者库中的图书、读者和借阅3个表输入记录。数据记录内容如表10-8-表10-10所示-序号项是为了查看方便，实际数据不含序号项-。" class="headerlink" title="(1)通过SQL Server Management Studio，向图书_读者库中的图书、读者和借阅3个表输入记录。数据记录内容如表10-8~表10-10所示(序号项是为了查看方便，实际数据不含序号项)。"></a>(1)通过SQL Server Management Studio，向图书_读者库中的图书、读者和借阅3个表输入记录。数据记录内容如表10-8~表10-10所示(序号项是为了查看方便，实际数据不含序号项)。</h4><p><img src="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446438272292939279" alt="img"></p>
+<p><img src="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446447656922272993" alt="img"></p>
+<p>要求：<br>a)先检查并表结构，使其符合表10-6图书读者库本表结构和约束。<br>b)数据输入后进行检查，并进行增删改操作，保证数据正确。</p>
+<h5 id="1-将数据记录插入图书表"><a href="#1-将数据记录插入图书表" class="headerlink" title="1. 将数据记录插入图书表"></a>1. 将数据记录插入图书表</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入图书表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000001&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>,<span class="string">&#x27;机械工业出版社&#x27;</span>,<span class="string">&#x27;李明&#x27;</span>,<span class="string">&#x27;计算机引论&#x27;</span>,<span class="string">&#x27;18&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000002&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>,<span class="string">&#x27;机械工业出版社&#x27;</span>,<span class="string">&#x27;王小红&#x27;</span>,<span class="string">&#x27;数据结构&#x27;</span>,<span class="string">&#x27;22&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000003&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>,<span class="string">&#x27;机械工业出版社&#x27;</span>,<span class="string">&#x27;李和明&#x27;</span>,<span class="string">&#x27;C语言编程&#x27;</span>,<span class="string">&#x27;25.5&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000004&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>,<span class="string">&#x27;电子工业出版社&#x27;</span>,<span class="string">&#x27;刘宏亮&#x27;</span>,<span class="string">&#x27;操作系统&#x27;</span>,<span class="string">&#x27;49.8&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000006&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>,<span class="string">&#x27;机械工业出版社&#x27;</span>,<span class="string">&#x27;刘宏亮&#x27;</span>,<span class="string">&#x27;数据结构&#x27;</span>,<span class="string">&#x27;21.6&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000005&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>,<span class="string">&#x27;电子工业出版社&#x27;</span>,<span class="string">&#x27;王小红&#x27;</span>,<span class="string">&#x27;计算机文化&#x27;</span>,<span class="string">&#x27;20&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;2000000007&#x27;</span>,<span class="string">&#x27;数学&#x27;</span>,<span class="string">&#x27;机械工业出版社&#x27;</span>,<span class="string">&#x27;吴非&#x27;</span>,<span class="string">&#x27;高等数学&#x27;</span>,<span class="string">&#x27;18&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;2000000008&#x27;</span>,<span class="string">&#x27;数学&#x27;</span>,<span class="string">&#x27;机械工业出版社&#x27;</span>,<span class="string">&#x27;丁玉应&#x27;</span>,<span class="string">&#x27;概率统计&#x27;</span>,<span class="string">&#x27;22.3&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;2000000009&#x27;</span>,<span class="string">&#x27;数学&#x27;</span>,<span class="string">&#x27;电子工业出版社&#x27;</span>,<span class="string">&#x27;赵明&#x27;</span>,<span class="string">&#x27;线性代数&#x27;</span>,<span class="string">&#x27;15&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书(书号,类别,出版社,作者,书名,定价) <span class="keyword">VALUES</span>(<span class="string">&#x27;3000000010&#x27;</span>,<span class="string">&#x27;物理&#x27;</span>,<span class="string">&#x27;电子工业出版社&#x27;</span>,<span class="string">&#x27;张共可&#x27;</span>,<span class="string">&#x27;力学&#x27;</span>,<span class="string">&#x27;19.8&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017734.png" alt="image-20240510170754317"></li>
+</ul>
+<h5 id="2-将数据记录插入读者表"><a href="#2-将数据记录插入读者表" class="headerlink" title="2. 将数据记录插入读者表"></a>2. 将数据记录插入读者表</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入读者表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000001&#x27;</span>,<span class="string">&#x27;李小明&#x27;</span>,<span class="string">&#x27;计算机系&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;13826388323&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000002&#x27;</span>,<span class="string">&#x27;王红&#x27;</span>,<span class="string">&#x27;计算机系&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;13826388378&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000003&#x27;</span>,<span class="string">&#x27;李和平&#x27;</span>,<span class="string">&#x27;计算机系&#x27;</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;13826385523&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000004&#x27;</span>,<span class="string">&#x27;刘宏亮&#x27;</span>,<span class="string">&#x27;计算机系&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;13826387623&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000005&#x27;</span>,<span class="string">&#x27;刘宏亮&#x27;</span>,<span class="string">&#x27;计算机系&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;13826356323&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000006&#x27;</span>,<span class="string">&#x27;王小红&#x27;</span>,<span class="string">&#x27;数学系&#x27;</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;13826381223&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000007&#x27;</span>,<span class="string">&#x27;吴小&#x27;</span>,<span class="string">&#x27;数学系&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;13826366323&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000008&#x27;</span>,<span class="string">&#x27;丁玉应&#x27;</span>,<span class="string">&#x27;数学系&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;13826898323&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000009&#x27;</span>,<span class="string">&#x27;赵名&#x27;</span>,<span class="string">&#x27;数学系&#x27;</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;13826348323&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 读者(编号,姓名,单位,性别,电话) <span class="keyword">VALUES</span>(<span class="string">&#x27;10000010&#x27;</span>,<span class="string">&#x27;张共可&#x27;</span>,<span class="string">&#x27;计算机系&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;13826384523&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017735.png" alt="image-20240510171006434"></li>
+</ul>
+<h5 id="3-将数据记录插入借阅表"><a href="#3-将数据记录插入借阅表" class="headerlink" title="3. 将数据记录插入借阅表"></a>3. 将数据记录插入借阅表</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入借阅表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000001&#x27;</span>,<span class="string">&#x27;10000001&#x27;</span>,<span class="string">&#x27;19981125&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000002&#x27;</span>,<span class="string">&#x27;10000002&#x27;</span>,<span class="string">&#x27;19981220&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000003&#x27;</span>,<span class="string">&#x27;10000003&#x27;</span>,<span class="string">&#x27;19990605&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000004&#x27;</span>,<span class="string">&#x27;10000004&#x27;</span>,<span class="string">&#x27;20061125&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000006&#x27;</span>,<span class="string">&#x27;10000001&#x27;</span>,<span class="string">&#x27;20061125&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;1000000005&#x27;</span>,<span class="string">&#x27;10000001&#x27;</span>,<span class="string">&#x27;20061125&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;2000000007&#x27;</span>,<span class="string">&#x27;10000001&#x27;</span>,<span class="string">&#x27;20061125&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;2000000008&#x27;</span>,<span class="string">&#x27;10000003&#x27;</span>,<span class="string">&#x27;20061125&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;2000000009&#x27;</span>,<span class="string">&#x27;10000004&#x27;</span>,<span class="string">&#x27;20061125&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 借阅(书号,读者编号,借阅日期) <span class="keyword">VALUES</span>(<span class="string">&#x27;3000000010&#x27;</span>,<span class="string">&#x27;10000001&#x27;</span>,<span class="string">&#x27;20061125&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017736.png" alt="image-20240510171201685"></li>
+</ul>
+<h4 id="2-通过SQL-Server-Management-Studio，向学生-课程库中的学生、课程和选课3个表输入记录。数据记录内容如表10-11-表10-13所示-序号项是为了查看方便，实际数据不含序号项-。"><a href="#2-通过SQL-Server-Management-Studio，向学生-课程库中的学生、课程和选课3个表输入记录。数据记录内容如表10-11-表10-13所示-序号项是为了查看方便，实际数据不含序号项-。" class="headerlink" title="(2)通过SQL Server Management Studio，向学生_课程库中的学生、课程和选课3个表输入记录。数据记录内容如表10-11~表10-13所示(序号项是为了查看方便，实际数据不含序号项)。"></a>(2)通过SQL Server Management Studio，向学生_课程库中的学生、课程和选课3个表输入记录。数据记录内容如表10-11~表10-13所示(序号项是为了查看方便，实际数据不含序号项)。</h4><p><img src="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446445473677989072" alt="img"></p>
+<p><img src="https://ccnu.ai-augmented.com/api/jx-oresource/cloud/file_access/6446445893007725782" alt="img"></p>
+<p>要求:<br>a)先检查并表结构，使其符合表10-7学生课程库基本表结构和约束。<br>b)数据输入后进行检查，并进行增删改操作，保证数据正确。</p>
+<h5 id="1-将数据记录插入学生表"><a href="#1-将数据记录插入学生表" class="headerlink" title="1.将数据记录插入学生表"></a>1.将数据记录插入学生表</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入学生表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;李明&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;张小红&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;李和明&#x27;</span>,<span class="number">22</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S4&#x27;</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;刘宏&#x27;</span>,<span class="number">23</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;王红应&#x27;</span>,<span class="number">20</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S7&#x27;</span>,<span class="string">&#x27;吴非&#x27;</span>,<span class="number">19</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;数学&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S8&#x27;</span>,<span class="string">&#x27;丁玉&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;数学&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S9&#x27;</span>,<span class="string">&#x27;赵名&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;数学&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S10&#x27;</span>,<span class="string">&#x27;张共可&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;物理&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017737.png" alt="image-20240510171921278"></li>
+</ul>
+<h5 id="2-将数据记录插入课程表"><a href="#2-将数据记录插入课程表" class="headerlink" title="2.将数据记录插入课程表"></a>2.将数据记录插入课程表</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入课程表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C1&#x27;</span>,<span class="string">&#x27;计算机引论&#x27;</span>,<span class="keyword">NULL</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C3&#x27;</span>,<span class="string">&#x27;C语言编程&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C2&#x27;</span>,<span class="string">&#x27;数据结构&#x27;</span>,<span class="string">&#x27;C3&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C5&#x27;</span>,<span class="string">&#x27;数据库&#x27;</span>,<span class="string">&#x27;C2&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C6&#x27;</span>,<span class="string">&#x27;计算机文化&#x27;</span>,<span class="keyword">NULL</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C4&#x27;</span>,<span class="string">&#x27;软件工程&#x27;</span>,<span class="string">&#x27;C6&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C7&#x27;</span>,<span class="string">&#x27;高等数学&#x27;</span>,<span class="keyword">NULL</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C9&#x27;</span>,<span class="string">&#x27;线性代数&#x27;</span>,<span class="string">&#x27;C7&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C8&#x27;</span>,<span class="string">&#x27;概率统计&#x27;</span>,<span class="string">&#x27;C9&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 课程(课程号,课程名,先行课) <span class="keyword">VALUES</span>(<span class="string">&#x27;C10&#x27;</span>,<span class="string">&#x27;力学&#x27;</span>,<span class="keyword">NULL</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017738.png" alt="image-20240510172203520"></li>
+</ul>
+<h5 id="3-将数据记录插入选课表"><a href="#3-将数据记录插入选课表" class="headerlink" title="3.将数据记录插入选课表"></a>3.将数据记录插入选课表</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入选课表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>,<span class="number">60</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>,<span class="number">93</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>,<span class="keyword">NULL</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S4&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>,<span class="number">89</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;C2&#x27;</span>,<span class="number">79</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;C2&#x27;</span>,<span class="keyword">NULL</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;C2&#x27;</span>,<span class="number">80</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S4&#x27;</span>,<span class="string">&#x27;C3&#x27;</span>,<span class="number">90</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;C3&#x27;</span>,<span class="number">92</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;C3&#x27;</span>,<span class="number">81</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;C7&#x27;</span>,<span class="number">85</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 选课(学号,课程号,成绩) <span class="keyword">VALUES</span>(<span class="string">&#x27;S4&#x27;</span>,<span class="string">&#x27;C7&#x27;</span>,<span class="number">75</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017739.png" alt="image-20240510172706546"></li>
+</ul>
+<h3 id="2、-提高操作实验"><a href="#2、-提高操作实验" class="headerlink" title="2、  提高操作实验"></a>2、  提高操作实验</h3><p>向自设计的数据库应用系统的数据库中的各表，输入多条实际数据，并实现数据的增、删、改操作。</p>
+<h6 id="1）增"><a href="#1）增" class="headerlink" title="1）增"></a>1）增</h6><ol>
+<li>将数据记录插入医生表<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入医生表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 医生(工号,姓名,年龄,性别,职称,科室) <span class="keyword">VALUES</span>(<span class="string">&#x27;D1&#x27;</span>,<span class="string">&#x27;张一&#x27;</span>,<span class="number">40</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;主任医师&#x27;</span>,<span class="string">&#x27;内科&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 医生(工号,姓名,年龄,性别,职称,科室) <span class="keyword">VALUES</span>(<span class="string">&#x27;D2&#x27;</span>,<span class="string">&#x27;张二&#x27;</span>,<span class="number">45</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;副主任医师&#x27;</span>,<span class="string">&#x27;病理科&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 医生(工号,姓名,年龄,性别,职称,科室) <span class="keyword">VALUES</span>(<span class="string">&#x27;D3&#x27;</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="number">47</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;主治医师&#x27;</span>,<span class="string">&#x27;放射科&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 医生(工号,姓名,年龄,性别,职称,科室) <span class="keyword">VALUES</span>(<span class="string">&#x27;D4&#x27;</span>,<span class="string">&#x27;张四&#x27;</span>,<span class="number">48</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;医师&#x27;</span>,<span class="string">&#x27;康复科&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 医生(工号,姓名,年龄,性别,职称,科室) <span class="keyword">VALUES</span>(<span class="string">&#x27;D5&#x27;</span>,<span class="string">&#x27;张五&#x27;</span>,<span class="number">42</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;主任医师&#x27;</span>,<span class="string">&#x27;眼科&#x27;</span>)</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>命令执行结果<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017740.png" alt="image-20240510202811745"></li>
+</ul>
+<ol start="2">
+<li>将数据记录插入患者表<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入患者表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 患者(患者号,姓名,性别,身份证号码) <span class="keyword">VALUES</span>(<span class="string">&#x27;P1&#x27;</span>,<span class="string">&#x27;李一&#x27;</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;510681195901102885&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 患者(患者号,姓名,性别,身份证号码) <span class="keyword">VALUES</span>(<span class="string">&#x27;P2&#x27;</span>,<span class="string">&#x27;李二&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;65312219670803739X&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 患者(患者号,姓名,性别,身份证号码) <span class="keyword">VALUES</span>(<span class="string">&#x27;P3&#x27;</span>,<span class="string">&#x27;李三&#x27;</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;530112199806295721&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 患者(患者号,姓名,性别,身份证号码) <span class="keyword">VALUES</span>(<span class="string">&#x27;P4&#x27;</span>,<span class="string">&#x27;李四&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;520523201410124976&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 患者(患者号,姓名,性别,身份证号码) <span class="keyword">VALUES</span>(<span class="string">&#x27;P5&#x27;</span>,<span class="string">&#x27;李五&#x27;</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;210711198812258326&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 患者(患者号,姓名,性别,身份证号码) <span class="keyword">VALUES</span>(<span class="string">&#x27;P6&#x27;</span>,<span class="string">&#x27;李六&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;130207196808088415&#x27;</span>)</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>命令执行结果<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017741.png" alt="image-20240510203421550"></li>
+</ul>
+<ol start="3">
+<li>将数据记录插入病历表<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--插入病历表的数据记录</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 病历(病历号,患者号,医生工号,就诊日期,病情描述) <span class="keyword">VALUES</span>(<span class="string">&#x27;1001&#x27;</span>,<span class="string">&#x27;P1&#x27;</span>,<span class="string">&#x27;D5&#x27;</span>,<span class="string">&#x27;20240508&#x27;</span>,<span class="string">&#x27;轻度&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 病历(病历号,患者号,医生工号,就诊日期,病情描述) <span class="keyword">VALUES</span>(<span class="string">&#x27;1002&#x27;</span>,<span class="string">&#x27;P2&#x27;</span>,<span class="string">&#x27;D4&#x27;</span>,<span class="string">&#x27;20240508&#x27;</span>,<span class="string">&#x27;中度&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 病历(病历号,患者号,医生工号,就诊日期,病情描述) <span class="keyword">VALUES</span>(<span class="string">&#x27;1003&#x27;</span>,<span class="string">&#x27;P3&#x27;</span>,<span class="string">&#x27;D3&#x27;</span>,<span class="string">&#x27;20240509&#x27;</span>,<span class="string">&#x27;轻度&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 病历(病历号,患者号,医生工号,就诊日期,病情描述) <span class="keyword">VALUES</span>(<span class="string">&#x27;1004&#x27;</span>,<span class="string">&#x27;P4&#x27;</span>,<span class="string">&#x27;D2&#x27;</span>,<span class="string">&#x27;20240510&#x27;</span>,<span class="string">&#x27;重度&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 病历(病历号,患者号,医生工号,就诊日期,病情描述) <span class="keyword">VALUES</span>(<span class="string">&#x27;1005&#x27;</span>,<span class="string">&#x27;P5&#x27;</span>,<span class="string">&#x27;D1&#x27;</span>,<span class="string">&#x27;20240510&#x27;</span>,<span class="string">&#x27;轻度&#x27;</span>)</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>命令执行结果<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017742.png" alt="image-20240510224018410"></li>
+</ul>
+<h6 id="2）删"><a href="#2）删" class="headerlink" title="2）删"></a>2）删</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> 病历 <span class="keyword">WHERE</span> 患者号<span class="operator">=</span><span class="string">&#x27;P1&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017743.png" alt="image-20240511081038704"></li>
+</ul>
+<h6 id="3）改"><a href="#3）改" class="headerlink" title="3）改"></a>3）改</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> 医生 <span class="keyword">SET</span> 职称<span class="operator">=</span><span class="string">&#x27;主任医师&#x27;</span> <span class="keyword">WHERE</span> 工号<span class="operator">=</span><span class="string">&#x27;D2&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017744.png" alt="image-20240511081228911"></li>
+</ul>
+<h3 id="3、选择操作实验"><a href="#3、选择操作实验" class="headerlink" title="3、选择操作实验"></a>3、选择操作实验</h3><ul>
+<li>读懂以下T-SQL的数据插入、删除和修改语句，在SSMS的查询分析器中正确输入每条语句，执行后检查结果。</li>
+</ul>
+<h4 id="1-数据插入操作"><a href="#1-数据插入操作" class="headerlink" title="(1) 数据插入操作"></a>(1) 数据插入操作</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">USE 图书读者数据库</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 图书</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;10000000001&#x27;</span>, <span class="string">&#x27;计算机&#x27;</span>, <span class="string">&#x27;机械工业出版社&#x27;</span>, <span class="string">&#x27;李明&#x27;</span>, <span class="string">&#x27;计算机引论&#x27;</span>, <span class="string">&#x27;25.00&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017745.png" alt="image-20240511082305128"></p>
+</li>
+<li><p>原因分析：图书表限制书号应为10位，命令中输入的书号为11位。</p>
+</li>
+<li><p>修改图书表限制后的命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017746.png" alt="image-20240511083039530"></p>
+</li>
+</ul>
+<h4 id="2-数据删除操作"><a href="#2-数据删除操作" class="headerlink" title="(2) 数据删除操作"></a>(2) 数据删除操作</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> 图书 <span class="keyword">WHERE</span> 书号<span class="operator">=</span><span class="string">&#x27;10000000001&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017747.png" alt="image-20240511083454649"></li>
+</ul>
+<h4 id="3-数据修改操作"><a href="#3-数据修改操作" class="headerlink" title="(3) 数据修改操作"></a>(3) 数据修改操作</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> 图书 <span class="keyword">SET</span> 定价<span class="operator">=</span><span class="number">26.5</span> <span class="keyword">WHERE</span> 书号<span class="operator">=</span><span class="string">&#x27;10000000001&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>（重新执行插入操作后的）命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017748.png" alt="image-20240511083657847"></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/07/25/%E6%90%AD%E5%BB%BABlog%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/" rel="prev" title="搭建Blog踩坑记录">
+      <i class="fa fa-chevron-left"></i> 搭建Blog踩坑记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%89-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%80%E5%8D%95%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/" rel="next" title="实验三-数据库简单查询和连接查询实验">
+      实验三-数据库简单查询和连接查询实验 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%BA%8C-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%BB%BA%E7%AB%8B%E5%92%8C%E7%BB%B4%E6%8A%A4%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.</span> <span class="nav-text">实验二 数据库的建立和维护实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AE%9E%E9%AA%8C%E7%9B%AE%E7%9A%84%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">一、实验目的：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%AE%9E%E9%AA%8C%E5%86%85%E5%AE%B9%EF%BC%9A"><span class="nav-number">1.2.</span> <span class="nav-text">二、实验内容：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.2.1.</span> <span class="nav-text">1、基本操作实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81-%E6%8F%90%E9%AB%98%E6%93%8D%E4%BD%9C%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.2.2.</span> <span class="nav-text">2、  提高操作实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E9%80%89%E6%8B%A9%E6%93%8D%E4%BD%9C%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.2.3.</span> <span class="nav-text">3、选择操作实验</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="undefined-0"
+      src="/images/miku.jpg">
+  <p class="site-author-name" itemprop="name">undefined-0</p>
+  <div class="site-description" itemprop="description">undefined-0的个人博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/undefined-0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;undefined-0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:sia.undefined.0@gmail.com" title="E-Mail → mailto:sia.undefined.0@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-star"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">undefined-0</span>
+</div>
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("6/30/2024 11:01:14"); //修改为你的网站开始运行的时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-leaf.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-leaf.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="实验七 数据完整性与安全性实验1)数据库安全性实验在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。 (1)设置服务器安全认证模式在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。 (2)建立用户和角色">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实验七-数据完整性与安全性实验">
+<meta property="og:url" content="http://example.com/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/index.html">
+<meta property="og:site_name" content="undefined-0&#39;s Blog">
+<meta property="og:description" content="实验七 数据完整性与安全性实验1)数据库安全性实验在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。 (1)设置服务器安全认证模式在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。 (2)建立用户和角色">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018663.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018664.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018665.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018666.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018667.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018668.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018669.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018670.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018671.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018672.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018673.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018674.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018675.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018676.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018677.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018678.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018679.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018680.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018681.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018682.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018683.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018684.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018685.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018686.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018687.png">
+<meta property="article:published_time" content="2025-06-23T02:50:10.000Z">
+<meta property="article:modified_time" content="2025-06-23T02:58:39.953Z">
+<meta property="article:author" content="undefined-0">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png">
+
+<link rel="canonical" href="http://example.com/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>实验七-数据完整性与安全性实验 | undefined-0's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">undefined-0's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">历添新岁月 春满旧山河</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          实验七-数据完整性与安全性实验
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-06-23 10:50:10 / 修改时间：10:58:39" itemprop="dateCreated datePublished" datetime="2025-06-23T10:50:10+08:00">2025-06-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="实验七-数据完整性与安全性实验"><a href="#实验七-数据完整性与安全性实验" class="headerlink" title="实验七 数据完整性与安全性实验"></a>实验七 数据完整性与安全性实验</h1><h2 id="1-数据库安全性实验"><a href="#1-数据库安全性实验" class="headerlink" title="1)数据库安全性实验"></a>1)数据库安全性实验</h2><p>在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。</p>
+<h3 id="1-设置服务器安全认证模式"><a href="#1-设置服务器安全认证模式" class="headerlink" title="(1)设置服务器安全认证模式"></a>(1)设置服务器安全认证模式</h3><p>在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。</p>
+<h3 id="2-建立用户和角色"><a href="#2-建立用户和角色" class="headerlink" title="(2)建立用户和角色"></a>(2)建立用户和角色</h3><p>I)为正在使用的SQL服务建立新登录名(名为”login1”)，使用SQL Server身份验证。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png" alt="image-20240607083259464" style="zoom: 50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018663.png" alt="image-20240607083440586"></p>
+<p>II)在学生课程库中，新建数据库用户名为”user1”(登名为”login1”)，新建学生课程数据库角色名为”rose1”。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018664.png" alt="image-20240607083814148" style="zoom:50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018665.png" alt="image-20240607084213226"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018666.png" alt="image-20240608203007823"></p>
+<p>iii)在图书读者数据库中，新建数据库用户名为”user2”(登录名为”login1”)，新建数据库角色名为”rose2”。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018667.png" alt="image-20240607085017218" style="zoom:50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018668.png" alt="image-20240607085640830"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018669.png" alt="image-20240608203118085"></p>
+<h3 id="3-设置权限"><a href="#3-设置权限" class="headerlink" title="(3)设置权限"></a>(3)设置权限</h3><p>I)使新登录”login1”加入到System Administrators服务器角色中，可访问学生课程数据库和图书读者数据库。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018670.png" alt="image-20240608202522076" style="zoom:50%;" />
+
+<p>II)在学生课程数据库中，将”user1”加人”rose1”和db-owner，通过选择角色对”rose1”授权。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018671.png" alt="image-20240608203355668" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018672.png" alt="image-20240608203858426" style="zoom:50%;" />
+
+<p>iii)在图书读者数据库中，将”user2”加人”rose2”和db-owner，通过对象(选择图书、读者和借阅表)对”rose2”授权。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018673.png" alt="image-20240608204915010" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018674.png" alt="image-20240608205218109" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018675.png" alt="image-20240608205316712" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018676.png" alt="image-20240608205359980" style="zoom:50%;" />
+
+<p>iv)使”rose2”和”rose1”都有创建表、创建视图和备份数据库的权限。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018677.png" alt="image-20240608204706205"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018678.png" alt="image-20240608204803511"></p>
+<h2 id="2-数据库完整性实验"><a href="#2-数据库完整性实验" class="headerlink" title="2)数据库完整性实验"></a>2)数据库完整性实验</h2><p>使用Transact-SQL设计触发器，通过SQL Server Management Studio定义它们。</p>
+<p>建立学生选课库中选课表的插入数据型触发器，保证学生选课库中选课表的参照完整性，以维护其外码与参照表中的主码一致。该实验的T-SQL参考代码如下。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018679.png" alt="image-20240608211632363"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018680.png" alt="image-20240608212352892"></p>
+<h2 id="3）数据库应用程序设计"><a href="#3）数据库应用程序设计" class="headerlink" title="3）数据库应用程序设计"></a>3）数据库应用程序设计</h2><p>1、自行设计数据库；<br>2、设计相关窗体能对数据库进行查询、浏览等基本操作。</p>
+<h3 id="（1）医院信息查询系统主界面"><a href="#（1）医院信息查询系统主界面" class="headerlink" title="（1）医院信息查询系统主界面"></a>（1）医院信息查询系统主界面</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018681.png" alt="image-20240609085056527" style="zoom: 50%;" />
+
+<h3 id="（2）医生信息查询"><a href="#（2）医生信息查询" class="headerlink" title="（2）医生信息查询"></a>（2）医生信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018682.png" alt="image-20240608221743915" style="zoom:33%;" />
+
+<h3 id="（3）患者信息查询"><a href="#（3）患者信息查询" class="headerlink" title="（3）患者信息查询"></a>（3）患者信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018683.png" alt="image-20240608221812733" style="zoom:33%;" />
+
+<h3 id="（4）病历查询"><a href="#（4）病历查询" class="headerlink" title="（4）病历查询"></a>（4）病历查询</h3><h4 id="i-根据患者编号查询"><a href="#i-根据患者编号查询" class="headerlink" title="i.根据患者编号查询"></a>i.根据患者编号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018684.png" alt="image-20240608221912606" style="zoom:33%;" />
+
+<h4 id="ii-根据医生工号查询"><a href="#ii-根据医生工号查询" class="headerlink" title="ii.根据医生工号查询"></a>ii.根据医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018685.png" alt="image-20240608221949165" style="zoom:33%;" />
+
+<h4 id="iii-同时使用患者号、医生工号查询"><a href="#iii-同时使用患者号、医生工号查询" class="headerlink" title="iii.同时使用患者号、医生工号查询"></a>iii.同时使用患者号、医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018686.png" alt="image-20240608222114538" style="zoom:33%;" />
+
+<h4 id="iv-模糊查询"><a href="#iv-模糊查询" class="headerlink" title="iv.模糊查询"></a>iv.模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018687.png" alt="image-20240608222143465" style="zoom:33%;" />
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/06/23/%E5%AE%9E%E9%AA%8C%E5%85%AD-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E8%A7%86%E5%9B%BE%E5%92%8C%E5%85%B3%E7%B3%BB%E5%9B%BE%E7%9A%84%E5%AE%9A%E4%B9%89%E5%8F%8A%E4%BD%BF%E7%94%A8%E5%AE%9E%E9%AA%8C/" rel="prev" title="实验六-数据库的视图和关系图的定义及使用实验">
+      <i class="fa fa-chevron-left"></i> 实验六-数据库的视图和关系图的定义及使用实验
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.</span> <span class="nav-text">实验七 数据完整性与安全性实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.1.</span> <span class="nav-text">1)数据库安全性实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%AE%BE%E7%BD%AE%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%89%E5%85%A8%E8%AE%A4%E8%AF%81%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">(1)设置服务器安全认证模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%BB%BA%E7%AB%8B%E7%94%A8%E6%88%B7%E5%92%8C%E8%A7%92%E8%89%B2"><span class="nav-number">1.1.2.</span> <span class="nav-text">(2)建立用户和角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%AE%BE%E7%BD%AE%E6%9D%83%E9%99%90"><span class="nav-number">1.1.3.</span> <span class="nav-text">(3)设置权限</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%8C%E6%95%B4%E6%80%A7%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.2.</span> <span class="nav-text">2)数据库完整性实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%EF%BC%89%E6%95%B0%E6%8D%AE%E5%BA%93%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.3.</span> <span class="nav-text">3）数据库应用程序设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E5%8C%BB%E9%99%A2%E4%BF%A1%E6%81%AF%E6%9F%A5%E8%AF%A2%E7%B3%BB%E7%BB%9F%E4%B8%BB%E7%95%8C%E9%9D%A2"><span class="nav-number">1.3.1.</span> <span class="nav-text">（1）医院信息查询系统主界面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E5%8C%BB%E7%94%9F%E4%BF%A1%E6%81%AF%E6%9F%A5%E8%AF%A2"><span class="nav-number">1.3.2.</span> <span class="nav-text">（2）医生信息查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E6%82%A3%E8%80%85%E4%BF%A1%E6%81%AF%E6%9F%A5%E8%AF%A2"><span class="nav-number">1.3.3.</span> <span class="nav-text">（3）患者信息查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E7%97%85%E5%8E%86%E6%9F%A5%E8%AF%A2"><span class="nav-number">1.3.4.</span> <span class="nav-text">（4）病历查询</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="undefined-0"
+      src="/images/miku.jpg">
+  <p class="site-author-name" itemprop="name">undefined-0</p>
+  <div class="site-description" itemprop="description">undefined-0的个人博客</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/undefined-0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;undefined-0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:sia.undefined.0@gmail.com" title="E-Mail → mailto:sia.undefined.0@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-star"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">undefined-0</span>
+</div>
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("6/30/2024 11:01:14"); //修改为你的网站开始运行的时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
