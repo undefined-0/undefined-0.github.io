@@ -45,6 +45,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> 数据库 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -63,6 +69,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> 数据库 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -83,6 +95,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> 数据库 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -101,6 +119,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> 数据库 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -121,6 +145,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> 数据库 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -140,24 +170,38 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> 数据库 </tag>
+            
+        </tags>
+      
     </entry>
     
     
     
     <entry>
-      <title>搭建Blog踩坑记录</title>
+      <title>hexo blog本地预览与部署不一致解决方法</title>
       <link href="/2024/07/25/%E6%90%AD%E5%BB%BABlog%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
       <url>/2024/07/25/%E6%90%AD%E5%BB%BABlog%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/</url>
       
-        <content type="html"><![CDATA[<h1 id="搭建Blog踩坑记录"><a href="#搭建Blog踩坑记录" class="headerlink" title="搭建Blog踩坑记录"></a>搭建Blog踩坑记录</h1><ul><li>本地新添了博文，使用<code>hexo server</code>查看，一切正常。</li><li><code>hexo d</code>，但显示<code>nothing to commit, working tree clean</code>？</li><li>解决方法：<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo generate</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure></li></ul>]]></content>
+        <content type="html"><![CDATA[<h1 id="hexo-blog本地预览与部署不一致解决方法"><a href="#hexo-blog本地预览与部署不一致解决方法" class="headerlink" title="hexo blog本地预览与部署不一致解决方法"></a>hexo blog本地预览与部署不一致解决方法</h1><ul><li>本地新添了博文，使用<code>hexo server</code>查看，一切正常。</li><li><code>hexo d</code>，但显示<code>nothing to commit, working tree clean</code>？</li><li>解决方法：<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo generate</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure></li></ul>]]></content>
       
       
       <categories>
           
           <category> 踩坑记录 </category>
           
+          <category> 搭建Blog踩坑记录 </category>
+          
       </categories>
       
+      
+        <tags>
+            
+            <tag> hexo blog </tag>
+            
+        </tags>
       
     </entry>
     
@@ -178,6 +222,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> AT89S52 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -196,6 +246,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> AT89S52 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -216,6 +272,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> AT89S52 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -234,6 +296,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> AT89S52 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -254,6 +322,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> AT89S52 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -272,6 +346,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> AT89S52 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -292,6 +372,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> AT89S52 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -311,6 +397,12 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> AT89S52 </tag>
+            
+        </tags>
+      
     </entry>
     
     
@@ -329,6 +421,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> 数据库 </tag>
+            
+        </tags>
       
     </entry>
     
