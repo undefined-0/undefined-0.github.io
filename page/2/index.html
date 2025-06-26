@@ -178,6 +178,88 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://undefined-0.github.io/2024/07/22/AT89S52-test6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/miku.jpg">
+      <meta itemprop="name" content="undefined-0">
+      <meta itemprop="description" content="undefined-0的个人博客">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="undefined-0's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/07/22/AT89S52-test6/" class="post-title-link" itemprop="url">AT89S52_test6</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-22 14:54:08" itemprop="dateCreated datePublished" datetime="2024-07-22T14:54:08+08:00">2024-07-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-07-24 20:29:39" itemprop="dateModified" datetime="2024-07-24T20:29:39+08:00">2024-07-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AT89S52/" itemprop="url" rel="index"><span itemprop="name">AT89S52</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="实验六-A-D-D-A-实验"><a href="#实验六-A-D-D-A-实验" class="headerlink" title="实验六 A&#x2F;D D&#x2F;A 实验"></a>实验六 A&#x2F;D D&#x2F;A 实验</h2><h3 id="test-6-1"><a href="#test-6-1" class="headerlink" title="test 6_1"></a>test 6_1</h3><p>A&#x2F;D实验<br>用AT89S52的MCU驱动ADC0809进行模数转换。程序启动时，由8个LED显示AD0809通道0的电压值（以二进制数形式）。<br>接线方法：实验书P108硬件连接表（忽略数码管部分，将P1口连至LED处）</p>
+<img src="AT89S52-test6/image-20240722150702777.png" alt="image-20240722150702777" style="zoom: 50%;" />
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">EOC 	BIT 	P3.0</span><br><span class="line"></span><br><span class="line">ORG 	0000H</span><br><span class="line">LJMP	MAIN</span><br><span class="line">ORG		0100H</span><br><span class="line"></span><br><span class="line">MAIN:	</span><br><span class="line">	MOV	A,#0FFH</span><br><span class="line">	MOV P0,A</span><br><span class="line">	MOV A,#00H</span><br><span class="line">	MOV P2,A</span><br><span class="line"></span><br><span class="line">LOOP:</span><br><span class="line">	MOV DPTR,#7FFFH ;选择P2.7（若给P2口赋全0，则接线时可以选取P2口的任意一位接片选信号CS）</span><br><span class="line">    MOV A,#00H ;任意值</span><br><span class="line">    MOVX @DPTR,A ;给AD一个写操作，启动转换</span><br><span class="line">    JNB EOC,$ ;等待转换结束</span><br><span class="line">	MOVX A,@DPTR ;将转换结果读入A       </span><br><span class="line">    MOV	P1,A ;将转换结果从P1输出</span><br><span class="line">	LJMP LOOP</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-6-2"><a href="#test-6-2" class="headerlink" title="test 6_2"></a>test 6_2</h3><p>D&#x2F;A实验<br>实现D&#x2F;A接口设计，编写程序输出占空比为1&#x2F;3的方波、锯齿波、三角波、正弦波。<br>用2个开关控制输出波形的类型，使用示波器观察波形。</p>
+<p>接线方法：P0接数模转换区DB0-DB7，P2.7接数模转换区CS，P3.6接数模转换区WR。<br>示波器红表笔接DA输出，黑表笔接GND。<br>P3.2（INT0）、P3.3（INT1）各接一个拨码开关，初始时置为高。</p>
+<p>效果：11-锯齿波 10-三角波 01-方波 00-正弦波</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line"></span><br><span class="line">ORG 0003H</span><br><span class="line">LJMP INT0_ISR</span><br><span class="line"></span><br><span class="line">ORG 0013H</span><br><span class="line">LJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">ORG 0050H</span><br><span class="line">MAIN:</span><br><span class="line">MOV IE,#85H ;1000 0101，允许外部中断INT1和INT0，开中断总开关</span><br><span class="line">SETB PX1 ;设外部中断1为高优先级中断</span><br><span class="line">; TCON不作其他配置，保持复位时的全0（外部中断触发方式为低电平）</span><br><span class="line"></span><br><span class="line">;MOV R0 #02H ;为控制方波占空比而设置的计数变量</span><br><span class="line"></span><br><span class="line">SAWTOOTH: ;锯齿波</span><br><span class="line">CLR A</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">LOOP_SAWTOOTH:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">SJMP LOOP_SAWTOOTH</span><br><span class="line"></span><br><span class="line">INT0_ISR:	;P3.2所接的开关置为低时进入外部中断0</span><br><span class="line">SQUARE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">LOOP_SQUARE:</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;高电平 一段延时</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;低电平 两段延时</span><br><span class="line">ACALL DELAY</span><br><span class="line">JB P3.2,EXIT ;若P3.2所接的开关被置为高，则退出中断</span><br><span class="line">SJMP LOOP_SQUARE ;若P3.2所接的开关仍为低，则继续输出方波</span><br><span class="line"></span><br><span class="line">DELAY:</span><br><span class="line">MOV R7,#0FFH</span><br><span class="line">DJNZ R7,$</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">EXIT:</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">INT1_ISR:	;P3.3所接的开关置为低时进入外部中断1</span><br><span class="line">JB P3.2,TRIANGLE	;若P3.2所接的开关被置为高，则输出三角波。否则输出正弦波。</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line"></span><br><span class="line">SIN:</span><br><span class="line">MOV R1,#63 ;一个周期内输出64个点</span><br><span class="line">LOOP_SIN:</span><br><span class="line">MOV DPTR,#TAB</span><br><span class="line">MOV A,R1</span><br><span class="line">MOVC A,@A+DPTR</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">NOP	;延时，可根据实际情况更改</span><br><span class="line">DJNZ R1,LOOP_SIN</span><br><span class="line">SJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">TAB:	;正弦波数据表</span><br><span class="line">DB 80H,8CH,98H,0A5H,0B0H,0BCH,0C7H,0D1H</span><br><span class="line">DB 0DAH,0E2H,0EAH,0F0H,0F6H,0FAH,0FDH,0FFH</span><br><span class="line">DB 0FFH,0FFH,0FDH,0FAH,0F6H,0F0H,0EAH,0E3H</span><br><span class="line">DB 0DAH,0D1H,0C7H,0BCH,0B1H,0A5H,99H,8CH</span><br><span class="line">DB 80H,73H,67H,5BH,4FH,43H,39H,2EH</span><br><span class="line">DB 25H,1DH,15H,0FH,09H,05H,02H,00H</span><br><span class="line">DB 00H,00H,02H,05H,09H,0EH,15H,1CH</span><br><span class="line">DB 25H,2EH,38H,43H,4EH,5AH,66H,73H</span><br><span class="line"></span><br><span class="line">TRIANGLE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">LOOP_TRIANGLE_INC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">CJNE A,#0FFH,LOOP_TRIANGLE_INC</span><br><span class="line">LOOP_TRIANGLE_DEC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">DEC A</span><br><span class="line">JNZ LOOP_TRIANGLE_DEC</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line">JNB P3.2,INT1_ISR	;若P3.2所接的开关被置为低，则进入中断服务程序1</span><br><span class="line">LJMP LOOP_TRIANGLE_INC</span><br><span class="line"></span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://undefined-0.github.io/2024/07/22/AT89S52-test5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -918,15 +1000,19 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
       </div>
   </nav>
 </div>
