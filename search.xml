@@ -30,6 +30,46 @@
       </tags>
   </entry>
   <entry>
+    <title>AT89S52_test2</title>
+    <url>/2024/07/22/AT89S52-test2/</url>
+    <content><![CDATA[<h2 id="实验二-并行接口输入输出实验"><a href="#实验二-并行接口输入输出实验" class="headerlink" title="实验二 并行接口输入输出实验"></a>实验二 并行接口输入输出实验</h2><h3 id="test-2-1"><a href="#test-2-1" class="headerlink" title="test 2_1"></a>test 2_1</h3><p>选用输出口接八只发光二极管，编写程序，使发光二极管循环点亮（采用软件延时）<br>接线方法：使用P1口连接LED</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">LOOP:</span><br><span class="line">MOV P1,A ;点亮P1.0连接的LED</span><br><span class="line">LCALL DELAY</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">SJMP LOOP</span><br><span class="line"></span><br><span class="line"> DELAY: MOV R0,#0AH ;延时子程序(延时时间约1秒)</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$</span><br><span class="line">DJNZ R1,DELAY2</span><br><span class="line">DJNZ R0,DELAY1</span><br><span class="line">RET</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-2-2"><a href="#test-2-2" class="headerlink" title="test 2_2"></a>test 2_2</h3><p>采用一个输入口和一个输出口，将开关的状态反映在发光二极管上<br>接线方法：P1口接开关，P0口接LED</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">LOOP:</span><br><span class="line">ORL P1,#0FFH ;读P1口之前先对其写1</span><br><span class="line">MOV A,P1 ;将P1口状态（按键状态）读入A</span><br><span class="line">MOV P0,A ;将按键状态送至P0，使其在LED上反映出来</span><br><span class="line">SJMP LOOP</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+      <tags>
+        <tag>AT89S52</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AT89S52_test5</title>
+    <url>/2024/07/22/AT89S52-test5/</url>
+    <content><![CDATA[<h2 id="实验五-计数器实验"><a href="#实验五-计数器实验" class="headerlink" title="实验五 计数器实验"></a>实验五 计数器实验</h2><h3 id="test-5-1"><a href="#test-5-1" class="headerlink" title="test 5_1"></a>test 5_1</h3><p>采用定时器与计数器相结合的方法使P1.7所接的发光二极管亮1秒、灭1秒，周而复始。<br>用三种组合实现：①查询方式+中断方式；②查询方式+查询方式；③中断方式+中断方式。</p>
+<p>接线方法：P1.7接一LED，P3.5（T1输入）接P1.0（周期为100ms的方波输出）</p>
+<p>①查询方式+中断方式<br>T1计数10，T0计时50ms<br>T1采用查询，T0采用中断</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 ;SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	</span><br><span class="line">	CHECK: 			;查询T1是否有中断溢出请求</span><br><span class="line">	JBC TF1,HANDLE	;若中断请求标志位TF1为1，则将其清零并跳转到处理程序</span><br><span class="line">	SJMP CHECK</span><br><span class="line">	</span><br><span class="line">	HANDLE:			;若T1有中断溢出请求，则取反P1.7</span><br><span class="line">	CPL P1.7</span><br><span class="line">	SJMP CHECK</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI	</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-2"><a href="#test-5-2" class="headerlink" title="test 5_2"></a>test 5_2</h3><p>②查询方式+查询方式<br>T1、T0皆采用查询</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	 ORG 0030H</span><br><span class="line">	 MAIN:</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 SETB P1.0 ;设P1.0初始为高电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB TR1 ;启动T1（定时）</span><br><span class="line">	 </span><br><span class="line">	 LABEL1:</span><br><span class="line">	 CPL P1.7</span><br><span class="line">	 </span><br><span class="line">	 LABEL2:</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 SETB TR0 ;启动T0（计数）</span><br><span class="line">	 </span><br><span class="line">	 LABEL3:</span><br><span class="line">	 JBC TF0,LABEL4 ;若50ms到了，则将中断请求标志位TF0清零并跳转LABEL4（翻转P1.0）</span><br><span class="line">	 SJMP LABEL3 ;50ms未到，继续查询中断请求标志位TF0状态</span><br><span class="line">	 </span><br><span class="line">	 LABEL4:</span><br><span class="line">	 CPL P1.0</span><br><span class="line">	 JBC TF1,LABEL1 ;若1s到了，则将中断请求标志位TF1清零并跳转LABEL1（翻转P1.7）</span><br><span class="line">	 AJMP LABEL2 ;某一个50ms到了，但1s没到，回到LABEL2对T0进行重装载</span><br><span class="line">	</span><br><span class="line">	 END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-3"><a href="#test-5-3" class="headerlink" title="test 5_3"></a>test 5_3</h3><p>③中断方式+中断方式<br>T1、T0皆采用中断</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	CPL P1.7</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-4"><a href="#test-5-4" class="headerlink" title="test 5_4"></a>test 5_4</h3><p>输入计数脉冲，将计数脉冲的个数显示出来（小于15次），循环往复<br>接线方法：P1口接八个LED，P3.5（T1输入）接按钮（按下一次，产生一个脉冲）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">;采用T1进行计数</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV TMOD,#60H ;0110 0000：设置T1为计数器，方式2</span><br><span class="line">	 MOV TH1,#0FFH ;按下一次按钮，进入一次中断</span><br><span class="line">	 MOV TL1,#0FFH</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	 CJNE A,#0FH,INCA ;若脉冲个数未到15个，则A直接加1</span><br><span class="line">	 MOV A,#0 ;若脉冲个数已到15个，则从零开始计数</span><br><span class="line">INCA:INC A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">     RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+      <tags>
+        <tag>AT89S52</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>AT89S52_test3</title>
     <url>/2024/07/22/AT89S52-test3/</url>
     <content><![CDATA[<h2 id="实验三-外部中断实验"><a href="#实验三-外部中断实验" class="headerlink" title="实验三 外部中断实验"></a>实验三 外部中断实验</h2><h3 id="test-3-1"><a href="#test-3-1" class="headerlink" title="test 3_1"></a>test 3_1</h3><p>通过外部中断使P1口的开关控制8个发光二极管，开始是P1.0所接的灯亮，以后每中断一次，下一个灯亮，顺序左移，周而复始。</p>
@@ -43,22 +83,6 @@
 <h3 id="test-3-3"><a href="#test-3-3" class="headerlink" title="test 3_3"></a>test 3_3</h3><p>外部中断控制P1口连接的8个发光二极管。<br>中断第一次，8个发光二极管循环点亮；<br>中断第二次，8个发光二极管逐个点亮；<br>中断第三次，8个发光二极管高四位和低四位交替亮灭。<br>如此循环往复。</p>
 <p>接线方法：P1口接8个LED，P3.2接按键</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">	</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">	</span><br><span class="line">ORG 0030H</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH</span><br><span class="line">MOV P1,A ;开始灯全灭</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">RELOAD:MOV R3,#03H ;计数变量</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A ;点亮P1.0所接的灯</span><br><span class="line">	</span><br><span class="line">LOOP0:</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#03,LOOP1</span><br><span class="line">SJMP LOOP0</span><br><span class="line">	</span><br><span class="line">LOOP1:</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A</span><br><span class="line">MOV R4,#00H</span><br><span class="line">ACALL DELAY</span><br><span class="line">LOOP11:</span><br><span class="line">ADD A,ACC</span><br><span class="line">MOV P1,A</span><br><span class="line">INC R4 ;计算是否满8次</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#02,LOOP2</span><br><span class="line">CJNE R4,#08H,LOOP11 ;不满8次，继续逐个点亮</span><br><span class="line">SJMP LOOP1 ;满8次，重新从全灭开始逐个点亮</span><br><span class="line">	</span><br><span class="line">LOOP2:</span><br><span class="line">MOV A,#0FH</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CPL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#01,RELOAD</span><br><span class="line">SJMP LOOP2</span><br><span class="line">	</span><br><span class="line">INTERRUPT1:</span><br><span class="line">DEC R3 ;R3减一</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">DELAY: MOV R0,#0AH</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$ </span><br><span class="line">DJNZ R1,DELAY2 </span><br><span class="line">DJNZ R0,DELAY1 </span><br><span class="line">RET</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-      <tags>
-        <tag>AT89S52</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>AT89S52_test2</title>
-    <url>/2024/07/22/AT89S52-test2/</url>
-    <content><![CDATA[<h2 id="实验二-并行接口输入输出实验"><a href="#实验二-并行接口输入输出实验" class="headerlink" title="实验二 并行接口输入输出实验"></a>实验二 并行接口输入输出实验</h2><h3 id="test-2-1"><a href="#test-2-1" class="headerlink" title="test 2_1"></a>test 2_1</h3><p>选用输出口接八只发光二极管，编写程序，使发光二极管循环点亮（采用软件延时）<br>接线方法：使用P1口连接LED</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">LOOP:</span><br><span class="line">MOV P1,A ;点亮P1.0连接的LED</span><br><span class="line">LCALL DELAY</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">SJMP LOOP</span><br><span class="line"></span><br><span class="line"> DELAY: MOV R0,#0AH ;延时子程序(延时时间约1秒)</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$</span><br><span class="line">DJNZ R1,DELAY2</span><br><span class="line">DJNZ R0,DELAY1</span><br><span class="line">RET</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-2-2"><a href="#test-2-2" class="headerlink" title="test 2_2"></a>test 2_2</h3><p>采用一个输入口和一个输出口，将开关的状态反映在发光二极管上<br>接线方法：P1口接开关，P0口接LED</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">LOOP:</span><br><span class="line">ORL P1,#0FFH ;读P1口之前先对其写1</span><br><span class="line">MOV A,P1 ;将P1口状态（按键状态）读入A</span><br><span class="line">MOV P0,A ;将按键状态送至P0，使其在LED上反映出来</span><br><span class="line">SJMP LOOP</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-]]></content>
       <categories>
         <category>AT89S52</category>
       </categories>
@@ -131,30 +155,6 @@
       </tags>
   </entry>
   <entry>
-    <title>AT89S52_test5</title>
-    <url>/2024/07/22/AT89S52-test5/</url>
-    <content><![CDATA[<h2 id="实验五-计数器实验"><a href="#实验五-计数器实验" class="headerlink" title="实验五 计数器实验"></a>实验五 计数器实验</h2><h3 id="test-5-1"><a href="#test-5-1" class="headerlink" title="test 5_1"></a>test 5_1</h3><p>采用定时器与计数器相结合的方法使P1.7所接的发光二极管亮1秒、灭1秒，周而复始。<br>用三种组合实现：①查询方式+中断方式；②查询方式+查询方式；③中断方式+中断方式。</p>
-<p>接线方法：P1.7接一LED，P3.5（T1输入）接P1.0（周期为100ms的方波输出）</p>
-<p>①查询方式+中断方式<br>T1计数10，T0计时50ms<br>T1采用查询，T0采用中断</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 ;SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	</span><br><span class="line">	CHECK: 			;查询T1是否有中断溢出请求</span><br><span class="line">	JBC TF1,HANDLE	;若中断请求标志位TF1为1，则将其清零并跳转到处理程序</span><br><span class="line">	SJMP CHECK</span><br><span class="line">	</span><br><span class="line">	HANDLE:			;若T1有中断溢出请求，则取反P1.7</span><br><span class="line">	CPL P1.7</span><br><span class="line">	SJMP CHECK</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI	</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-5-2"><a href="#test-5-2" class="headerlink" title="test 5_2"></a>test 5_2</h3><p>②查询方式+查询方式<br>T1、T0皆采用查询</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	 ORG 0030H</span><br><span class="line">	 MAIN:</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 SETB P1.0 ;设P1.0初始为高电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB TR1 ;启动T1（定时）</span><br><span class="line">	 </span><br><span class="line">	 LABEL1:</span><br><span class="line">	 CPL P1.7</span><br><span class="line">	 </span><br><span class="line">	 LABEL2:</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 SETB TR0 ;启动T0（计数）</span><br><span class="line">	 </span><br><span class="line">	 LABEL3:</span><br><span class="line">	 JBC TF0,LABEL4 ;若50ms到了，则将中断请求标志位TF0清零并跳转LABEL4（翻转P1.0）</span><br><span class="line">	 SJMP LABEL3 ;50ms未到，继续查询中断请求标志位TF0状态</span><br><span class="line">	 </span><br><span class="line">	 LABEL4:</span><br><span class="line">	 CPL P1.0</span><br><span class="line">	 JBC TF1,LABEL1 ;若1s到了，则将中断请求标志位TF1清零并跳转LABEL1（翻转P1.7）</span><br><span class="line">	 AJMP LABEL2 ;某一个50ms到了，但1s没到，回到LABEL2对T0进行重装载</span><br><span class="line">	</span><br><span class="line">	 END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-5-3"><a href="#test-5-3" class="headerlink" title="test 5_3"></a>test 5_3</h3><p>③中断方式+中断方式<br>T1、T0皆采用中断</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	CPL P1.7</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-5-4"><a href="#test-5-4" class="headerlink" title="test 5_4"></a>test 5_4</h3><p>输入计数脉冲，将计数脉冲的个数显示出来（小于15次），循环往复<br>接线方法：P1口接八个LED，P3.5（T1输入）接按钮（按下一次，产生一个脉冲）</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">;采用T1进行计数</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV TMOD,#60H ;0110 0000：设置T1为计数器，方式2</span><br><span class="line">	 MOV TH1,#0FFH ;按下一次按钮，进入一次中断</span><br><span class="line">	 MOV TL1,#0FFH</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	 CJNE A,#0FH,INCA ;若脉冲个数未到15个，则A直接加1</span><br><span class="line">	 MOV A,#0 ;若脉冲个数已到15个，则从零开始计数</span><br><span class="line">INCA:INC A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">     RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-      <tags>
-        <tag>AT89S52</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>AT89S52_test8</title>
     <url>/2024/07/24/AT89S52-test8/</url>
     <content><![CDATA[<h2 id="实验八-综合实验-十字路口交通灯"><a href="#实验八-综合实验-十字路口交通灯" class="headerlink" title="实验八 综合实验 十字路口交通灯"></a>实验八 综合实验 十字路口交通灯</h2><p>南北红灯（D1、D7）亮维持15秒，在南北红灯亮的同时东西绿灯（D5、D11）也亮，并维持10s。<br>到10s时，东西绿灯（D5、D11）闪亮，闪亮3s后熄灭。<br>在东西绿灯（D5、D11）熄灭时，东西黄灯（D6、D12）亮，并维持2秒。<br>到2秒时，东西黄灯（D6、D12）熄灭，东西红灯（D4、D10）亮，同时南北红灯（D1、D7）熄灭，绿灯（D2、D8）亮。</p>
@@ -179,6 +179,70 @@
             <i class="fa fa-quote-right"></i>
           </blockquote>
 ]]></content>
+  </entry>
+  <entry>
+    <title>实验七-数据完整性与安全性实验</title>
+    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/</url>
+    <content><![CDATA[<h1 id="实验七-数据完整性与安全性实验"><a href="#实验七-数据完整性与安全性实验" class="headerlink" title="实验七 数据完整性与安全性实验"></a>实验七 数据完整性与安全性实验</h1><h2 id="1-数据库安全性实验"><a href="#1-数据库安全性实验" class="headerlink" title="1)数据库安全性实验"></a>1)数据库安全性实验</h2><p>在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。</p>
+<h3 id="1-设置服务器安全认证模式"><a href="#1-设置服务器安全认证模式" class="headerlink" title="(1)设置服务器安全认证模式"></a>(1)设置服务器安全认证模式</h3><p>在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。</p>
+<h3 id="2-建立用户和角色"><a href="#2-建立用户和角色" class="headerlink" title="(2)建立用户和角色"></a>(2)建立用户和角色</h3><p>I)为正在使用的SQL服务建立新登录名(名为”login1”)，使用SQL Server身份验证。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png" alt="image-20240607083259464" style="zoom: 50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018663.png" alt="image-20240607083440586"></p>
+<p>II)在学生课程库中，新建数据库用户名为”user1”(登名为”login1”)，新建学生课程数据库角色名为”rose1”。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018664.png" alt="image-20240607083814148" style="zoom:50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018665.png" alt="image-20240607084213226"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018666.png" alt="image-20240608203007823"></p>
+<p>iii)在图书读者数据库中，新建数据库用户名为”user2”(登录名为”login1”)，新建数据库角色名为”rose2”。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018667.png" alt="image-20240607085017218" style="zoom:50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018668.png" alt="image-20240607085640830"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018669.png" alt="image-20240608203118085"></p>
+<h3 id="3-设置权限"><a href="#3-设置权限" class="headerlink" title="(3)设置权限"></a>(3)设置权限</h3><p>I)使新登录”login1”加入到System Administrators服务器角色中，可访问学生课程数据库和图书读者数据库。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018670.png" alt="image-20240608202522076" style="zoom:50%;" />
+
+<p>II)在学生课程数据库中，将”user1”加人”rose1”和db-owner，通过选择角色对”rose1”授权。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018671.png" alt="image-20240608203355668" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018672.png" alt="image-20240608203858426" style="zoom:50%;" />
+
+<p>iii)在图书读者数据库中，将”user2”加人”rose2”和db-owner，通过对象(选择图书、读者和借阅表)对”rose2”授权。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018673.png" alt="image-20240608204915010" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018674.png" alt="image-20240608205218109" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018675.png" alt="image-20240608205316712" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018676.png" alt="image-20240608205359980" style="zoom:50%;" />
+
+<p>iv)使”rose2”和”rose1”都有创建表、创建视图和备份数据库的权限。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018677.png" alt="image-20240608204706205"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018678.png" alt="image-20240608204803511"></p>
+<h2 id="2-数据库完整性实验"><a href="#2-数据库完整性实验" class="headerlink" title="2)数据库完整性实验"></a>2)数据库完整性实验</h2><p>使用Transact-SQL设计触发器，通过SQL Server Management Studio定义它们。</p>
+<p>建立学生选课库中选课表的插入数据型触发器，保证学生选课库中选课表的参照完整性，以维护其外码与参照表中的主码一致。该实验的T-SQL参考代码如下。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018679.png" alt="image-20240608211632363"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018680.png" alt="image-20240608212352892"></p>
+<h2 id="3）数据库应用程序设计"><a href="#3）数据库应用程序设计" class="headerlink" title="3）数据库应用程序设计"></a>3）数据库应用程序设计</h2><p>1、自行设计数据库；<br>2、设计相关窗体能对数据库进行查询、浏览等基本操作。</p>
+<h3 id="（1）医院信息查询系统主界面"><a href="#（1）医院信息查询系统主界面" class="headerlink" title="（1）医院信息查询系统主界面"></a>（1）医院信息查询系统主界面</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018681.png" alt="image-20240609085056527" style="zoom: 50%;" />
+
+<h3 id="（2）医生信息查询"><a href="#（2）医生信息查询" class="headerlink" title="（2）医生信息查询"></a>（2）医生信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018682.png" alt="image-20240608221743915" style="zoom:33%;" />
+
+<h3 id="（3）患者信息查询"><a href="#（3）患者信息查询" class="headerlink" title="（3）患者信息查询"></a>（3）患者信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018683.png" alt="image-20240608221812733" style="zoom:33%;" />
+
+<h3 id="（4）病历查询"><a href="#（4）病历查询" class="headerlink" title="（4）病历查询"></a>（4）病历查询</h3><h4 id="i-根据患者编号查询"><a href="#i-根据患者编号查询" class="headerlink" title="i.根据患者编号查询"></a>i.根据患者编号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018684.png" alt="image-20240608221912606" style="zoom:33%;" />
+
+<h4 id="ii-根据医生工号查询"><a href="#ii-根据医生工号查询" class="headerlink" title="ii.根据医生工号查询"></a>ii.根据医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018685.png" alt="image-20240608221949165" style="zoom:33%;" />
+
+<h4 id="iii-同时使用患者号、医生工号查询"><a href="#iii-同时使用患者号、医生工号查询" class="headerlink" title="iii.同时使用患者号、医生工号查询"></a>iii.同时使用患者号、医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018686.png" alt="image-20240608222114538" style="zoom:33%;" />
+
+<h4 id="iv-模糊查询"><a href="#iv-模糊查询" class="headerlink" title="iv.模糊查询"></a>iv.模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018687.png" alt="image-20240608222143465" style="zoom:33%;" />]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>数据库</tag>
+      </tags>
   </entry>
   <entry>
     <title>实验一_数据库定义实验</title>
@@ -318,62 +382,68 @@
       </tags>
   </entry>
   <entry>
-    <title>实验七-数据完整性与安全性实验</title>
-    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/</url>
-    <content><![CDATA[<h1 id="实验七-数据完整性与安全性实验"><a href="#实验七-数据完整性与安全性实验" class="headerlink" title="实验七 数据完整性与安全性实验"></a>实验七 数据完整性与安全性实验</h1><h2 id="1-数据库安全性实验"><a href="#1-数据库安全性实验" class="headerlink" title="1)数据库安全性实验"></a>1)数据库安全性实验</h2><p>在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。</p>
-<h3 id="1-设置服务器安全认证模式"><a href="#1-设置服务器安全认证模式" class="headerlink" title="(1)设置服务器安全认证模式"></a>(1)设置服务器安全认证模式</h3><p>在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。</p>
-<h3 id="2-建立用户和角色"><a href="#2-建立用户和角色" class="headerlink" title="(2)建立用户和角色"></a>(2)建立用户和角色</h3><p>I)为正在使用的SQL服务建立新登录名(名为”login1”)，使用SQL Server身份验证。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png" alt="image-20240607083259464" style="zoom: 50%;" />
+    <title>实验三-数据库简单查询和连接查询实验</title>
+    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%89-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%80%E5%8D%95%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
+    <content><![CDATA[<h1 id="实验三-数据库简单查询和连接查询实验"><a href="#实验三-数据库简单查询和连接查询实验" class="headerlink" title="实验三 数据库简单查询和连接查询实验"></a>实验三 数据库简单查询和连接查询实验</h1><h2 id="1、基本操作实验"><a href="#1、基本操作实验" class="headerlink" title="1、基本操作实验"></a>1、基本操作实验</h2><ul>
+<li><p>本实验的主要内容如下：<br>（1）简单查询操作。该实验包括投影、选择条件表达，数据排序，使用临时表等。<br>（2）连接查询操作。该实验包括等值连接、自然连接、求笛卡儿积、一般连接、外连接、内连接、左连接、右连接和自连接等。</p>
+</li>
+<li><p>实验题目和要求：<br>​		检查并修改学生课程库的效据，使之与表10-11至表10-13的数据一致；将下列查询要求用T-SQL语句表示；在SSMS的查询分析器中输人相应的T-SQL语句，执行并在结果区中查看内容；结果不正确时要对T-SQL语句修改，直到正确为止。</p>
+</li>
+</ul>
+<h3 id="（1）简单查询实验内容"><a href="#（1）简单查询实验内容" class="headerlink" title="（1）简单查询实验内容"></a>（1）简单查询实验内容</h3><p>在学生课程数据库中：</p>
+<ol>
+<li><p>求数学系学生的学号和姓名。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017868.png" alt="image-20240511085620338"></p>
+</li>
+<li><p>求选修了课程的学生学号。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017869.png" alt="image-20240511085940442"></p>
+</li>
+</ol>
+<ol start="3">
+<li><p>求选修C1课程的学生学号和成绩，并要求对查询结果按成绩的降序排列，如果成绩相同则按学号的升序排列。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017870.png" alt="image-20240511090359145"></p>
+</li>
+<li><p>求选修课程C1且成绩在80-90之间的学生学号和成续，将成绩乘以系数0.8输出。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017871.png" alt="image-20240511090810858"></p>
+</li>
+<li><p>求数学系或计算机系姓张的学生的信息。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017872.png" alt="image-20240511091027963"></p>
+</li>
+<li><p>求缺少了成绩的学生的学号和课程号<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017873.png" alt="image-20240511091214888"></p>
+</li>
+</ol>
+<h3 id="（2）连接查询实验内容"><a href="#（2）连接查询实验内容" class="headerlink" title="（2）连接查询实验内容"></a>（2）连接查询实验内容</h3><p>在学生课程数据库中:</p>
+<ol>
+<li><p>查询每个学生的情况以及他（她）所选修的课程。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017875.png" alt="image-20240511091918917"></p>
+</li>
+<li><p>求学生的学号、姓名、选修的课程名及成绩。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017876.png" alt="image-20240511092227294"></p>
+</li>
+<li><p>求选修C1课程且成绩为90分以上的学生学号、姓名及成绩<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017877.png" alt="image-20240511092425146"></p>
+</li>
+<li><p>查询每一门课的间接先行课（即先行课的先行课）<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017878.png" alt="image-20240511093432729"></p>
+</li>
+</ol>
+<h2 id="2、选择操作实验"><a href="#2、选择操作实验" class="headerlink" title="2、选择操作实验"></a>2、选择操作实验</h2><p>建立学生社团数据库和基本表，向库中输入一定的记录，并实现其数据的内连接和各种外查询操作。</p>
+<h4 id="1-建立学生社团数据库和基本表"><a href="#1-建立学生社团数据库和基本表" class="headerlink" title="1. 建立学生社团数据库和基本表"></a>1. 建立学生社团数据库和基本表</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE 学生社团数据库</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">USE 学生社团数据库</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 学生 (</span><br><span class="line">    学号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    姓名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    年龄 <span class="type">INT</span>,</span><br><span class="line">    性别 <span class="type">CHAR</span>(<span class="number">2</span>),</span><br><span class="line">    所在系 <span class="type">VARCHAR</span>(<span class="number">50</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 社团 (</span><br><span class="line">    社团编号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    社团名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 社团成员 (</span><br><span class="line">    学号 <span class="type">INT</span>,</span><br><span class="line">    社团编号 <span class="type">INT</span>,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (学号, 社团编号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (学号) <span class="keyword">REFERENCES</span> 学生(学号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (社团编号) <span class="keyword">REFERENCES</span> 社团(社团编号)</span><br><span class="line">);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018663.png" alt="image-20240607083440586"></p>
-<p>II)在学生课程库中，新建数据库用户名为”user1”(登名为”login1”)，新建学生课程数据库角色名为”rose1”。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018664.png" alt="image-20240607083814148" style="zoom:50%;" />
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017879.png" alt="image-20240517082435923"></li>
+</ul>
+<h4 id="2-输入数据记录"><a href="#2-输入数据记录" class="headerlink" title="2. 输入数据记录"></a>2. 输入数据记录</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;李明&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;张小红&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;李和明&#x27;</span>,<span class="number">22</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S4&#x27;</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;刘宏&#x27;</span>,<span class="number">23</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;张共可&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;物理&#x27;</span>)</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C1&#x27;</span>,<span class="string">&#x27;计算机协会&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C2&#x27;</span>,<span class="string">&#x27;英语俱乐部&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C3&#x27;</span>,<span class="string">&#x27;书画社&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C4&#x27;</span>,<span class="string">&#x27;话剧社&#x27;</span>)</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;C2&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;C3&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;C4&#x27;</span>)</span><br><span class="line">GO</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018665.png" alt="image-20240607084213226"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018666.png" alt="image-20240608203007823"></p>
-<p>iii)在图书读者数据库中，新建数据库用户名为”user2”(登录名为”login1”)，新建数据库角色名为”rose2”。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018667.png" alt="image-20240607085017218" style="zoom:50%;" />
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017880.png" alt="image-20240517082623049"></li>
+</ul>
+<p> <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017881.png" alt="image-20240517082655218"> </p>
+<p> <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017882.png" alt="image-20240517085347935"> </p>
+<h4 id="3-查询操作"><a href="#3-查询操作" class="headerlink" title="3. 查询操作"></a>3. 查询操作</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询1. 查询加入了编号为C1的社团的学生学号</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> 学号 <span class="keyword">FROM</span> 社团成员</span><br><span class="line"><span class="keyword">WHERE</span> 社团编号 <span class="operator">=</span> <span class="string">&#x27;C1&#x27;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018668.png" alt="image-20240607085640830"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018669.png" alt="image-20240608203118085"></p>
-<h3 id="3-设置权限"><a href="#3-设置权限" class="headerlink" title="(3)设置权限"></a>(3)设置权限</h3><p>I)使新登录”login1”加入到System Administrators服务器角色中，可访问学生课程数据库和图书读者数据库。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018670.png" alt="image-20240608202522076" style="zoom:50%;" />
+<ul>
+<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017883.png" alt="image-20240517090458246"></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询2. 查询已加入社团的学生及其社团信息</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> 学生.姓名,社团.社团名 <span class="keyword">FROM</span> 学生,社团,社团成员</span><br><span class="line"><span class="keyword">WHERE</span> 学生.学号 <span class="operator">=</span> 社团成员.学号 <span class="keyword">AND</span> 社团.社团编号 <span class="operator">=</span> 社团成员.社团编号</span><br></pre></td></tr></table></figure>
 
-<p>II)在学生课程数据库中，将”user1”加人”rose1”和db-owner，通过选择角色对”rose1”授权。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018671.png" alt="image-20240608203355668" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018672.png" alt="image-20240608203858426" style="zoom:50%;" />
-
-<p>iii)在图书读者数据库中，将”user2”加人”rose2”和db-owner，通过对象(选择图书、读者和借阅表)对”rose2”授权。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018673.png" alt="image-20240608204915010" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018674.png" alt="image-20240608205218109" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018675.png" alt="image-20240608205316712" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018676.png" alt="image-20240608205359980" style="zoom:50%;" />
-
-<p>iv)使”rose2”和”rose1”都有创建表、创建视图和备份数据库的权限。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018677.png" alt="image-20240608204706205"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018678.png" alt="image-20240608204803511"></p>
-<h2 id="2-数据库完整性实验"><a href="#2-数据库完整性实验" class="headerlink" title="2)数据库完整性实验"></a>2)数据库完整性实验</h2><p>使用Transact-SQL设计触发器，通过SQL Server Management Studio定义它们。</p>
-<p>建立学生选课库中选课表的插入数据型触发器，保证学生选课库中选课表的参照完整性，以维护其外码与参照表中的主码一致。该实验的T-SQL参考代码如下。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018679.png" alt="image-20240608211632363"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018680.png" alt="image-20240608212352892"></p>
-<h2 id="3）数据库应用程序设计"><a href="#3）数据库应用程序设计" class="headerlink" title="3）数据库应用程序设计"></a>3）数据库应用程序设计</h2><p>1、自行设计数据库；<br>2、设计相关窗体能对数据库进行查询、浏览等基本操作。</p>
-<h3 id="（1）医院信息查询系统主界面"><a href="#（1）医院信息查询系统主界面" class="headerlink" title="（1）医院信息查询系统主界面"></a>（1）医院信息查询系统主界面</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018681.png" alt="image-20240609085056527" style="zoom: 50%;" />
-
-<h3 id="（2）医生信息查询"><a href="#（2）医生信息查询" class="headerlink" title="（2）医生信息查询"></a>（2）医生信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018682.png" alt="image-20240608221743915" style="zoom:33%;" />
-
-<h3 id="（3）患者信息查询"><a href="#（3）患者信息查询" class="headerlink" title="（3）患者信息查询"></a>（3）患者信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018683.png" alt="image-20240608221812733" style="zoom:33%;" />
-
-<h3 id="（4）病历查询"><a href="#（4）病历查询" class="headerlink" title="（4）病历查询"></a>（4）病历查询</h3><h4 id="i-根据患者编号查询"><a href="#i-根据患者编号查询" class="headerlink" title="i.根据患者编号查询"></a>i.根据患者编号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018684.png" alt="image-20240608221912606" style="zoom:33%;" />
-
-<h4 id="ii-根据医生工号查询"><a href="#ii-根据医生工号查询" class="headerlink" title="ii.根据医生工号查询"></a>ii.根据医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018685.png" alt="image-20240608221949165" style="zoom:33%;" />
-
-<h4 id="iii-同时使用患者号、医生工号查询"><a href="#iii-同时使用患者号、医生工号查询" class="headerlink" title="iii.同时使用患者号、医生工号查询"></a>iii.同时使用患者号、医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018686.png" alt="image-20240608222114538" style="zoom:33%;" />
-
-<h4 id="iv-模糊查询"><a href="#iv-模糊查询" class="headerlink" title="iv.模糊查询"></a>iv.模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018687.png" alt="image-20240608222143465" style="zoom:33%;" />]]></content>
+<ul>
+<li><p>命令执行结果：</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017884.png" alt="image-20240517090408402"></p>
+</li>
+</ul>
+]]></content>
       <categories>
         <category>数据库</category>
       </categories>
@@ -564,6 +634,34 @@
       </tags>
   </entry>
   <entry>
+    <title>树莓派更改当前用户密码</title>
+    <url>/2025/06/26/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%9B%B4%E6%94%B9%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81/</url>
+    <content><![CDATA[<h1 id="树莓派更改当前用户密码"><a href="#树莓派更改当前用户密码" class="headerlink" title="树莓派更改当前用户密码"></a>树莓派更改当前用户密码</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo raspi-config</span><br></pre></td></tr></table></figure>
+
+<p>打开树莓派配置。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414940.png" alt="image-20250628211158069"></p>
+<blockquote>
+<p>操作方式：上下键（↑）（↓）选择，回车确认，Tab键转到下方按键（上图中为<Select>与<finish>）</p>
+</blockquote>
+<p>选择<code>1 System Options</code>，回车确认，进入子菜单。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414941.png" alt="image-20250628211227592"></p>
+<p>选择<code>S3 Password</code>，回车确认，进入如下界面：</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414942.png" alt="屏幕截图 2025-06-28 211251"></p>
+<p>按下回车，回到终端，如下图。在光标处直接输入新密码，输入完毕后回车。<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414944.png" alt="屏幕截图 2025-06-28 211752"></p>
+<p>再次输入新密码，输入完毕后回车。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414945.png" alt="屏幕截图 2025-06-28 212647"></p>
+<p>出现如下界面即表示密码更新成功。回车选择OK即可。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414946.png" alt="image-20250628213115050"></p>
+]]></content>
+      <categories>
+        <category>树莓派</category>
+      </categories>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>Raspberry Pi</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>实验四-数据库的嵌套查询实验</title>
     <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E5%9B%9B-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%B5%8C%E5%A5%97%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
     <content><![CDATA[<h1 id="实验四-数据库的嵌套查询实验"><a href="#实验四-数据库的嵌套查询实验" class="headerlink" title="实验四 数据库的嵌套查询实验"></a>实验四 数据库的嵌套查询实验</h1><h2 id="一、基本操作实验"><a href="#一、基本操作实验" class="headerlink" title="一、基本操作实验"></a>一、基本操作实验</h2><h3 id="1）准备测试数据"><a href="#1）准备测试数据" class="headerlink" title="1）准备测试数据"></a>1）准备测试数据</h3><p>检查并修改学生_课程库的数据：使学生表与表10-11数据一致，选课表与表10-13的数据一致；课程表数据与表10-18 数据一致(修改课程数据为只有C1、C2、C3 和 C7 课程)。</p>
@@ -639,76 +737,6 @@
       </tags>
   </entry>
   <entry>
-    <title>实验三-数据库简单查询和连接查询实验</title>
-    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%89-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%80%E5%8D%95%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
-    <content><![CDATA[<h1 id="实验三-数据库简单查询和连接查询实验"><a href="#实验三-数据库简单查询和连接查询实验" class="headerlink" title="实验三 数据库简单查询和连接查询实验"></a>实验三 数据库简单查询和连接查询实验</h1><h2 id="1、基本操作实验"><a href="#1、基本操作实验" class="headerlink" title="1、基本操作实验"></a>1、基本操作实验</h2><ul>
-<li><p>本实验的主要内容如下：<br>（1）简单查询操作。该实验包括投影、选择条件表达，数据排序，使用临时表等。<br>（2）连接查询操作。该实验包括等值连接、自然连接、求笛卡儿积、一般连接、外连接、内连接、左连接、右连接和自连接等。</p>
-</li>
-<li><p>实验题目和要求：<br>​		检查并修改学生课程库的效据，使之与表10-11至表10-13的数据一致；将下列查询要求用T-SQL语句表示；在SSMS的查询分析器中输人相应的T-SQL语句，执行并在结果区中查看内容；结果不正确时要对T-SQL语句修改，直到正确为止。</p>
-</li>
-</ul>
-<h3 id="（1）简单查询实验内容"><a href="#（1）简单查询实验内容" class="headerlink" title="（1）简单查询实验内容"></a>（1）简单查询实验内容</h3><p>在学生课程数据库中：</p>
-<ol>
-<li><p>求数学系学生的学号和姓名。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017868.png" alt="image-20240511085620338"></p>
-</li>
-<li><p>求选修了课程的学生学号。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017869.png" alt="image-20240511085940442"></p>
-</li>
-</ol>
-<ol start="3">
-<li><p>求选修C1课程的学生学号和成绩，并要求对查询结果按成绩的降序排列，如果成绩相同则按学号的升序排列。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017870.png" alt="image-20240511090359145"></p>
-</li>
-<li><p>求选修课程C1且成绩在80-90之间的学生学号和成续，将成绩乘以系数0.8输出。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017871.png" alt="image-20240511090810858"></p>
-</li>
-<li><p>求数学系或计算机系姓张的学生的信息。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017872.png" alt="image-20240511091027963"></p>
-</li>
-<li><p>求缺少了成绩的学生的学号和课程号<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017873.png" alt="image-20240511091214888"></p>
-</li>
-</ol>
-<h3 id="（2）连接查询实验内容"><a href="#（2）连接查询实验内容" class="headerlink" title="（2）连接查询实验内容"></a>（2）连接查询实验内容</h3><p>在学生课程数据库中:</p>
-<ol>
-<li><p>查询每个学生的情况以及他（她）所选修的课程。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017875.png" alt="image-20240511091918917"></p>
-</li>
-<li><p>求学生的学号、姓名、选修的课程名及成绩。<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017876.png" alt="image-20240511092227294"></p>
-</li>
-<li><p>求选修C1课程且成绩为90分以上的学生学号、姓名及成绩<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017877.png" alt="image-20240511092425146"></p>
-</li>
-<li><p>查询每一门课的间接先行课（即先行课的先行课）<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017878.png" alt="image-20240511093432729"></p>
-</li>
-</ol>
-<h2 id="2、选择操作实验"><a href="#2、选择操作实验" class="headerlink" title="2、选择操作实验"></a>2、选择操作实验</h2><p>建立学生社团数据库和基本表，向库中输入一定的记录，并实现其数据的内连接和各种外查询操作。</p>
-<h4 id="1-建立学生社团数据库和基本表"><a href="#1-建立学生社团数据库和基本表" class="headerlink" title="1. 建立学生社团数据库和基本表"></a>1. 建立学生社团数据库和基本表</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE 学生社团数据库</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line">USE 学生社团数据库</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 学生 (</span><br><span class="line">    学号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    姓名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    年龄 <span class="type">INT</span>,</span><br><span class="line">    性别 <span class="type">CHAR</span>(<span class="number">2</span>),</span><br><span class="line">    所在系 <span class="type">VARCHAR</span>(<span class="number">50</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 社团 (</span><br><span class="line">    社团编号 <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    社团名 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 社团成员 (</span><br><span class="line">    学号 <span class="type">INT</span>,</span><br><span class="line">    社团编号 <span class="type">INT</span>,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (学号, 社团编号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (学号) <span class="keyword">REFERENCES</span> 学生(学号),</span><br><span class="line">    <span class="keyword">FOREIGN</span> KEY (社团编号) <span class="keyword">REFERENCES</span> 社团(社团编号)</span><br><span class="line">);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017879.png" alt="image-20240517082435923"></li>
-</ul>
-<h4 id="2-输入数据记录"><a href="#2-输入数据记录" class="headerlink" title="2. 输入数据记录"></a>2. 输入数据记录</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;李明&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;张小红&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;李和明&#x27;</span>,<span class="number">22</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S4&#x27;</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;刘宏&#x27;</span>,<span class="number">23</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;计算机&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 学生(学号,姓名,年龄,性别,所在系) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;张共可&#x27;</span>,<span class="number">21</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;物理&#x27;</span>)</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C1&#x27;</span>,<span class="string">&#x27;计算机协会&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C2&#x27;</span>,<span class="string">&#x27;英语俱乐部&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C3&#x27;</span>,<span class="string">&#x27;书画社&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团(社团编号,社团名) <span class="keyword">VALUES</span>(<span class="string">&#x27;C4&#x27;</span>,<span class="string">&#x27;话剧社&#x27;</span>)</span><br><span class="line">GO</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S1&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S2&#x27;</span>,<span class="string">&#x27;C2&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S3&#x27;</span>,<span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S5&#x27;</span>,<span class="string">&#x27;C3&#x27;</span>)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 社团成员(学号,社团编号) <span class="keyword">VALUES</span>(<span class="string">&#x27;S6&#x27;</span>,<span class="string">&#x27;C4&#x27;</span>)</span><br><span class="line">GO</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017880.png" alt="image-20240517082623049"></li>
-</ul>
-<p> <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017881.png" alt="image-20240517082655218"> </p>
-<p> <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017882.png" alt="image-20240517085347935"> </p>
-<h4 id="3-查询操作"><a href="#3-查询操作" class="headerlink" title="3. 查询操作"></a>3. 查询操作</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询1. 查询加入了编号为C1的社团的学生学号</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> 学号 <span class="keyword">FROM</span> 社团成员</span><br><span class="line"><span class="keyword">WHERE</span> 社团编号 <span class="operator">=</span> <span class="string">&#x27;C1&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>命令执行结果：<br><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017883.png" alt="image-20240517090458246"></li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询2. 查询已加入社团的学生及其社团信息</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> 学生.姓名,社团.社团名 <span class="keyword">FROM</span> 学生,社团,社团成员</span><br><span class="line"><span class="keyword">WHERE</span> 学生.学号 <span class="operator">=</span> 社团成员.学号 <span class="keyword">AND</span> 社团.社团编号 <span class="operator">=</span> 社团成员.社团编号</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>命令执行结果：</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231017884.png" alt="image-20240517090408402"></p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>数据库</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>hexo blog本地预览与部署不一致解决方法</title>
     <url>/2024/07/25/%E6%90%AD%E5%BB%BABlog%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<h1 id="hexo-blog本地预览与部署不一致解决方法"><a href="#hexo-blog本地预览与部署不一致解决方法" class="headerlink" title="hexo blog本地预览与部署不一致解决方法"></a>hexo blog本地预览与部署不一致解决方法</h1><ul>
@@ -740,34 +768,6 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">su</span><br></pre></td></tr></table></figure>
 
 <p>输入刚设置的密码，进入root账户。</p>
-]]></content>
-      <categories>
-        <category>树莓派</category>
-      </categories>
-      <tags>
-        <tag>树莓派</tag>
-        <tag>Raspberry Pi</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>树莓派更改当前用户密码</title>
-    <url>/2025/06/26/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%9B%B4%E6%94%B9%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81/</url>
-    <content><![CDATA[<h1 id="树莓派更改当前用户密码"><a href="#树莓派更改当前用户密码" class="headerlink" title="树莓派更改当前用户密码"></a>树莓派更改当前用户密码</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo raspi-config</span><br></pre></td></tr></table></figure>
-
-<p>打开树莓派配置。</p>
-<p><img src="/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%9B%B4%E6%94%B9%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81.assets/image-20250628211158069.png" alt="image-20250628211158069"></p>
-<blockquote>
-<p>操作方式：上下键（↑）（↓）选择，回车确认，Tab键转到下方按键（上图中为<Select>与<finish>）</p>
-</blockquote>
-<p>选择<code>1 System Options</code>，回车确认，进入子菜单。</p>
-<p><img src="/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%9B%B4%E6%94%B9%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81.assets/image-20250628211227592.png" alt="image-20250628211227592"></p>
-<p>选择<code>S3 Password</code>，回车确认，进入如下界面：</p>
-<p>![屏幕截图 2025-06-28 211251](树莓派更改当前用户密码.assets&#x2F;屏幕截图 2025-06-28 211251.png)</p>
-<p>按下回车，回到终端，如下图。在光标处直接输入新密码，输入完毕后回车。![屏幕截图 2025-06-28 211752](树莓派更改当前用户密码.assets&#x2F;屏幕截图 2025-06-28 211752.png)</p>
-<p>再次输入新密码，输入完毕后回车。</p>
-<p><img src="/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%9B%B4%E6%94%B9%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81.assets/image-20250628212720389.png" alt="image-20250628212720389"></p>
-<p>出现如下界面即表示密码更新成功。回车选择OK即可。</p>
-<p><img src="/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%9B%B4%E6%94%B9%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81.assets/image-20250628213115050.png" alt="image-20250628213115050"></p>
 ]]></content>
       <categories>
         <category>树莓派</category>
