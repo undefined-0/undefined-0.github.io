@@ -17,29 +17,6 @@
       </tags>
   </entry>
   <entry>
-    <title>AT89S52_test4</title>
-    <url>/2024/07/22/AT89S52-test4/</url>
-    <content><![CDATA[<h2 id="实验四-定时器实验"><a href="#实验四-定时器实验" class="headerlink" title="实验四 定时器实验"></a>实验四 定时器实验</h2><p>注：本实验所用单片机外接晶振频率为11.059MHz</p>
-<h3 id="test-4-1"><a href="#test-4-1" class="headerlink" title="test 4_1"></a>test 4_1</h3><p>采用定时器控制从P1.0口输出1000Hz方波信号，占空比为1&#x2F;4。</p>
-<p>接线方法：P1.0接示波器红表笔，任找一低电平接黑表笔。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	CLR P1.0 ;设P1.0、P1.1初始为低电平</span><br><span class="line">	MOV TMOD,11H ;0000 0001：设置T0为定时器，工作在方式1</span><br><span class="line">	MOV TH0,#0FFH ;开启后立即进入中断</span><br><span class="line">	MOV TL0,#0FEH</span><br><span class="line">	SETB ET0 ;允许T0中断</span><br><span class="line">	SETB TR0 ;启动T0</span><br><span class="line">	SETB EA ;开中断总开关</span><br><span class="line">	SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">    CLR TR0 ;停止T0</span><br><span class="line">    CPL P1.0 ;反转P1.0</span><br><span class="line">    JNB P1.0, T0_CHANGE_TIME ;如果P1.0为低电平，设置T0为低电平持续时间</span><br><span class="line">    MOV TH0, #0FFH ;重装载（250μs，高电平持续时间）</span><br><span class="line">    MOV TL0, #01AH</span><br><span class="line">    SETB TR0;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T0_CHANGE_TIME:</span><br><span class="line">    MOV TH0, #0FDH ;重装载（750μs，低电平持续时间）</span><br><span class="line">    MOV TL0, #4DH</span><br><span class="line">    SETB TR0 ;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-4-2"><a href="#test-4-2" class="headerlink" title="test 4_2"></a>test 4_2</h3><p>采用定时器控制从P1.0和P1.1分别输出周期为3ms占空比为1&#x2F;3的方波和周期为为500μs占空比为1&#x2F;5的方波。</p>
-<p>接线方法：P1.0接示波器红表笔（CH1），任找一低电平接黑表笔<br>                  P1.1接示波器红表笔（CH2），任找一低电平接黑表笔</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0050H</span><br><span class="line">	MAIN:</span><br><span class="line">	CLR P1.0 ;设P1.0、P1.1初始为低电平</span><br><span class="line">    CLR P1.1</span><br><span class="line">	MOV TMOD,#11H ;0001 0001：设置T1、T0都为定时器，都工作在方式1</span><br><span class="line">	MOV TH0,#0FFH ;开启后立即进入中断</span><br><span class="line">	MOV TL0,#0FEH</span><br><span class="line">	MOV TH1,#0FFH</span><br><span class="line">	MOV TL1,#0FEH</span><br><span class="line">	SETB ET0 ;允许T0中断</span><br><span class="line">	SETB ET1 ;允许T1中断</span><br><span class="line">	SETB TR0 ;启动T0</span><br><span class="line">	SETB TR1 ;启动T1</span><br><span class="line">	SETB EA ;开中断总开关</span><br><span class="line">	SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">    CLR TR0 ;停止T0</span><br><span class="line">    CPL P1.0 ;反转P1.0</span><br><span class="line">    JNB P1.0, T0_CHANGE_TIME ;如果P1.0为低电平，设置T0为低电平持续时间</span><br><span class="line">    MOV TH0, #0FCH ;重装载（1ms，高电平持续时间）</span><br><span class="line">    MOV TL0, #066H</span><br><span class="line">    SETB TR0;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T0_CHANGE_TIME:</span><br><span class="line">    MOV TH0, #0F8H ;重装载（2ms，低电平持续时间）</span><br><span class="line">    MOV TL0, #0CDH</span><br><span class="line">    SETB TR0 ;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	T1_ISR:</span><br><span class="line">    CLR TR1 ;停止T1</span><br><span class="line">    CPL P1.1 ;反转P1.1</span><br><span class="line">    JNB P1.1, T1_CHANGE_TIME ;如果P1.1为低电平，设置T1为低电平持续时间</span><br><span class="line">    MOV TH1, #0FFH ;重装载（100μs，高电平持续时间）</span><br><span class="line">    MOV TL1, #0A4H</span><br><span class="line">    SETB TR1;重新启动T1</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T1_CHANGE_TIME:</span><br><span class="line">    MOV TH1, #0FEH ;重装载（400μs，低电平持续时间）</span><br><span class="line">    MOV TL1, #8FH</span><br><span class="line">    SETB TR1 ;重新启动T1</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
-
-<p>来自其他人的一种更好的写法：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">;采用定时器控制从P1.0和P1.1分别输出周期为3ms占空比为1/3的方波和周期为500微秒占空比为1/5的方波。</span><br><span class="line">;11.0592MHz，1.085069微秒</span><br><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 000BH</span><br><span class="line">AJMP TIMER0_ISR</span><br><span class="line">ORG 001BH</span><br><span class="line">AJMP TIMER1_ISR</span><br><span class="line">ORG 0100H</span><br><span class="line">MAIN:MOV TMOD, #00010010H ; 设置定时器0为模式1、定时器1为模式2 (16位定时器、8位定时器)</span><br><span class="line">    MOV TH0, #0FCH        ; 设置定时器0初始值 (1ms)</span><br><span class="line">    MOV TL0, #03FH</span><br><span class="line">    MOV TH1, #0A4H        ; 设置定时器1初始值 (100微秒)</span><br><span class="line">    MOV TL1, #0A4H</span><br><span class="line">    MOV R0, #2            ; 计数2（低电平2ms）</span><br><span class="line">    MOV R1, #4            ; 计数4（低电平400微秒）</span><br><span class="line">    CLR P1.0              ; 低电平</span><br><span class="line">    CLR P1.1              ; 低电平</span><br><span class="line">    SETB ET0              ; 使能定时器0中断</span><br><span class="line">    SETB ET1              ; 使能定时器1中断</span><br><span class="line">    SETB EA               ; 使能全局中断</span><br><span class="line">    SETB TR0              ; 启动定时器0</span><br><span class="line">    SETB TR1              ; 启动定时器1</span><br><span class="line">LOOP: SJMP LOOP           ; 无限循环</span><br><span class="line"></span><br><span class="line">TIMER0_ISR: MOV TH0, #0FCH       ; 重装载定时器0初始值</span><br><span class="line">            MOV TL0, #03FH</span><br><span class="line">            DJNZ R0, EXIT        ; R0=0 P1.0=1 </span><br><span class="line">            CPL P1.0</span><br><span class="line">            JB P1.0, CYCLE1      ; P1.0=1-&gt;CYCLE1&amp;P1.0=0-&gt;R0=2</span><br><span class="line">            MOV R0, #2             </span><br><span class="line">            SJMP EXIT</span><br><span class="line">CYCLE1: MOV R0, #1</span><br><span class="line">        SJMP EXIT</span><br><span class="line"></span><br><span class="line">TIMER1_ISR: MOV TH1, #0A4H       ; 重装载定时器1初始值</span><br><span class="line">            MOV TL1, #0A4H</span><br><span class="line">            DJNZ R1, EXIT        ; R1=0 P1.0=1 </span><br><span class="line">            CPL P1.1</span><br><span class="line">            JB P1.1, CYCLE2      ; P1.1=1-&gt;CYCLE2&amp;P1.1=0-&gt;R1=4</span><br><span class="line">            MOV R1, #4           </span><br><span class="line">            SJMP EXIT</span><br><span class="line">CYCLE2: MOV R1, #1 </span><br><span class="line">        SJMP EXIT</span><br><span class="line">        </span><br><span class="line">EXIT:RETI</span><br><span class="line">     END</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-      <tags>
-        <tag>AT89S52</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>AT89S52_test1</title>
     <url>/2024/07/22/AT89S52-test1/</url>
     <content><![CDATA[<h2 id="写在最前面"><a href="#写在最前面" class="headerlink" title="写在最前面"></a>写在最前面</h2><p>本分类内使用的单片机皆为AT89S52，外接晶振频率为11.059MHz。</p>
@@ -59,6 +36,53 @@
 
 <h4 id="test1-3-3"><a href="#test1-3-3" class="headerlink" title="test1_3_3"></a>test1_3_3</h4><p>教材第55页8题。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV SP,#60H</span><br><span class="line">MOV 30H,#24H</span><br><span class="line">MOV 31H,#10H</span><br><span class="line">PUSH 30H</span><br><span class="line">PUSH 31H</span><br><span class="line">POP DPL</span><br><span class="line">POP DPH</span><br><span class="line">MOV A,#00H</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">SJMP $</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+      <tags>
+        <tag>AT89S52</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AT89S52_test5</title>
+    <url>/2024/07/22/AT89S52-test5/</url>
+    <content><![CDATA[<h2 id="实验五-计数器实验"><a href="#实验五-计数器实验" class="headerlink" title="实验五 计数器实验"></a>实验五 计数器实验</h2><h3 id="test-5-1"><a href="#test-5-1" class="headerlink" title="test 5_1"></a>test 5_1</h3><p>采用定时器与计数器相结合的方法使P1.7所接的发光二极管亮1秒、灭1秒，周而复始。<br>用三种组合实现：①查询方式+中断方式；②查询方式+查询方式；③中断方式+中断方式。</p>
+<p>接线方法：P1.7接一LED，P3.5（T1输入）接P1.0（周期为100ms的方波输出）</p>
+<p>①查询方式+中断方式<br>T1计数10，T0计时50ms<br>T1采用查询，T0采用中断</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 ;SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	</span><br><span class="line">	CHECK: 			;查询T1是否有中断溢出请求</span><br><span class="line">	JBC TF1,HANDLE	;若中断请求标志位TF1为1，则将其清零并跳转到处理程序</span><br><span class="line">	SJMP CHECK</span><br><span class="line">	</span><br><span class="line">	HANDLE:			;若T1有中断溢出请求，则取反P1.7</span><br><span class="line">	CPL P1.7</span><br><span class="line">	SJMP CHECK</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI	</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-2"><a href="#test-5-2" class="headerlink" title="test 5_2"></a>test 5_2</h3><p>②查询方式+查询方式<br>T1、T0皆采用查询</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	 ORG 0030H</span><br><span class="line">	 MAIN:</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 SETB P1.0 ;设P1.0初始为高电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB TR1 ;启动T1（定时）</span><br><span class="line">	 </span><br><span class="line">	 LABEL1:</span><br><span class="line">	 CPL P1.7</span><br><span class="line">	 </span><br><span class="line">	 LABEL2:</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 SETB TR0 ;启动T0（计数）</span><br><span class="line">	 </span><br><span class="line">	 LABEL3:</span><br><span class="line">	 JBC TF0,LABEL4 ;若50ms到了，则将中断请求标志位TF0清零并跳转LABEL4（翻转P1.0）</span><br><span class="line">	 SJMP LABEL3 ;50ms未到，继续查询中断请求标志位TF0状态</span><br><span class="line">	 </span><br><span class="line">	 LABEL4:</span><br><span class="line">	 CPL P1.0</span><br><span class="line">	 JBC TF1,LABEL1 ;若1s到了，则将中断请求标志位TF1清零并跳转LABEL1（翻转P1.7）</span><br><span class="line">	 AJMP LABEL2 ;某一个50ms到了，但1s没到，回到LABEL2对T0进行重装载</span><br><span class="line">	</span><br><span class="line">	 END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-3"><a href="#test-5-3" class="headerlink" title="test 5_3"></a>test 5_3</h3><p>③中断方式+中断方式<br>T1、T0皆采用中断</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	CPL P1.7</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-4"><a href="#test-5-4" class="headerlink" title="test 5_4"></a>test 5_4</h3><p>输入计数脉冲，将计数脉冲的个数显示出来（小于15次），循环往复<br>接线方法：P1口接八个LED，P3.5（T1输入）接按钮（按下一次，产生一个脉冲）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">;采用T1进行计数</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV TMOD,#60H ;0110 0000：设置T1为计数器，方式2</span><br><span class="line">	 MOV TH1,#0FFH ;按下一次按钮，进入一次中断</span><br><span class="line">	 MOV TL1,#0FFH</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	 CJNE A,#0FH,INCA ;若脉冲个数未到15个，则A直接加1</span><br><span class="line">	 MOV A,#0 ;若脉冲个数已到15个，则从零开始计数</span><br><span class="line">INCA:INC A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">     RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+      <tags>
+        <tag>AT89S52</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AT89S52_test4</title>
+    <url>/2024/07/22/AT89S52-test4/</url>
+    <content><![CDATA[<h2 id="实验四-定时器实验"><a href="#实验四-定时器实验" class="headerlink" title="实验四 定时器实验"></a>实验四 定时器实验</h2><p>注：本实验所用单片机外接晶振频率为11.059MHz</p>
+<h3 id="test-4-1"><a href="#test-4-1" class="headerlink" title="test 4_1"></a>test 4_1</h3><p>采用定时器控制从P1.0口输出1000Hz方波信号，占空比为1&#x2F;4。</p>
+<p>接线方法：P1.0接示波器红表笔，任找一低电平接黑表笔。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	CLR P1.0 ;设P1.0、P1.1初始为低电平</span><br><span class="line">	MOV TMOD,11H ;0000 0001：设置T0为定时器，工作在方式1</span><br><span class="line">	MOV TH0,#0FFH ;开启后立即进入中断</span><br><span class="line">	MOV TL0,#0FEH</span><br><span class="line">	SETB ET0 ;允许T0中断</span><br><span class="line">	SETB TR0 ;启动T0</span><br><span class="line">	SETB EA ;开中断总开关</span><br><span class="line">	SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">    CLR TR0 ;停止T0</span><br><span class="line">    CPL P1.0 ;反转P1.0</span><br><span class="line">    JNB P1.0, T0_CHANGE_TIME ;如果P1.0为低电平，设置T0为低电平持续时间</span><br><span class="line">    MOV TH0, #0FFH ;重装载（250μs，高电平持续时间）</span><br><span class="line">    MOV TL0, #01AH</span><br><span class="line">    SETB TR0;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T0_CHANGE_TIME:</span><br><span class="line">    MOV TH0, #0FDH ;重装载（750μs，低电平持续时间）</span><br><span class="line">    MOV TL0, #4DH</span><br><span class="line">    SETB TR0 ;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-4-2"><a href="#test-4-2" class="headerlink" title="test 4_2"></a>test 4_2</h3><p>采用定时器控制从P1.0和P1.1分别输出周期为3ms占空比为1&#x2F;3的方波和周期为为500μs占空比为1&#x2F;5的方波。</p>
+<p>接线方法：P1.0接示波器红表笔（CH1），任找一低电平接黑表笔<br>                  P1.1接示波器红表笔（CH2），任找一低电平接黑表笔</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0050H</span><br><span class="line">	MAIN:</span><br><span class="line">	CLR P1.0 ;设P1.0、P1.1初始为低电平</span><br><span class="line">    CLR P1.1</span><br><span class="line">	MOV TMOD,#11H ;0001 0001：设置T1、T0都为定时器，都工作在方式1</span><br><span class="line">	MOV TH0,#0FFH ;开启后立即进入中断</span><br><span class="line">	MOV TL0,#0FEH</span><br><span class="line">	MOV TH1,#0FFH</span><br><span class="line">	MOV TL1,#0FEH</span><br><span class="line">	SETB ET0 ;允许T0中断</span><br><span class="line">	SETB ET1 ;允许T1中断</span><br><span class="line">	SETB TR0 ;启动T0</span><br><span class="line">	SETB TR1 ;启动T1</span><br><span class="line">	SETB EA ;开中断总开关</span><br><span class="line">	SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">    CLR TR0 ;停止T0</span><br><span class="line">    CPL P1.0 ;反转P1.0</span><br><span class="line">    JNB P1.0, T0_CHANGE_TIME ;如果P1.0为低电平，设置T0为低电平持续时间</span><br><span class="line">    MOV TH0, #0FCH ;重装载（1ms，高电平持续时间）</span><br><span class="line">    MOV TL0, #066H</span><br><span class="line">    SETB TR0;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T0_CHANGE_TIME:</span><br><span class="line">    MOV TH0, #0F8H ;重装载（2ms，低电平持续时间）</span><br><span class="line">    MOV TL0, #0CDH</span><br><span class="line">    SETB TR0 ;重新启动T0</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	T1_ISR:</span><br><span class="line">    CLR TR1 ;停止T1</span><br><span class="line">    CPL P1.1 ;反转P1.1</span><br><span class="line">    JNB P1.1, T1_CHANGE_TIME ;如果P1.1为低电平，设置T1为低电平持续时间</span><br><span class="line">    MOV TH1, #0FFH ;重装载（100μs，高电平持续时间）</span><br><span class="line">    MOV TL1, #0A4H</span><br><span class="line">    SETB TR1;重新启动T1</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">	T1_CHANGE_TIME:</span><br><span class="line">    MOV TH1, #0FEH ;重装载（400μs，低电平持续时间）</span><br><span class="line">    MOV TL1, #8FH</span><br><span class="line">    SETB TR1 ;重新启动T1</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<p>来自其他人的一种更好的写法：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">;采用定时器控制从P1.0和P1.1分别输出周期为3ms占空比为1/3的方波和周期为500微秒占空比为1/5的方波。</span><br><span class="line">;11.0592MHz，1.085069微秒</span><br><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 000BH</span><br><span class="line">AJMP TIMER0_ISR</span><br><span class="line">ORG 001BH</span><br><span class="line">AJMP TIMER1_ISR</span><br><span class="line">ORG 0100H</span><br><span class="line">MAIN:MOV TMOD, #00010010H ; 设置定时器0为模式1、定时器1为模式2 (16位定时器、8位定时器)</span><br><span class="line">    MOV TH0, #0FCH        ; 设置定时器0初始值 (1ms)</span><br><span class="line">    MOV TL0, #03FH</span><br><span class="line">    MOV TH1, #0A4H        ; 设置定时器1初始值 (100微秒)</span><br><span class="line">    MOV TL1, #0A4H</span><br><span class="line">    MOV R0, #2            ; 计数2（低电平2ms）</span><br><span class="line">    MOV R1, #4            ; 计数4（低电平400微秒）</span><br><span class="line">    CLR P1.0              ; 低电平</span><br><span class="line">    CLR P1.1              ; 低电平</span><br><span class="line">    SETB ET0              ; 使能定时器0中断</span><br><span class="line">    SETB ET1              ; 使能定时器1中断</span><br><span class="line">    SETB EA               ; 使能全局中断</span><br><span class="line">    SETB TR0              ; 启动定时器0</span><br><span class="line">    SETB TR1              ; 启动定时器1</span><br><span class="line">LOOP: SJMP LOOP           ; 无限循环</span><br><span class="line"></span><br><span class="line">TIMER0_ISR: MOV TH0, #0FCH       ; 重装载定时器0初始值</span><br><span class="line">            MOV TL0, #03FH</span><br><span class="line">            DJNZ R0, EXIT        ; R0=0 P1.0=1 </span><br><span class="line">            CPL P1.0</span><br><span class="line">            JB P1.0, CYCLE1      ; P1.0=1-&gt;CYCLE1&amp;P1.0=0-&gt;R0=2</span><br><span class="line">            MOV R0, #2             </span><br><span class="line">            SJMP EXIT</span><br><span class="line">CYCLE1: MOV R0, #1</span><br><span class="line">        SJMP EXIT</span><br><span class="line"></span><br><span class="line">TIMER1_ISR: MOV TH1, #0A4H       ; 重装载定时器1初始值</span><br><span class="line">            MOV TL1, #0A4H</span><br><span class="line">            DJNZ R1, EXIT        ; R1=0 P1.0=1 </span><br><span class="line">            CPL P1.1</span><br><span class="line">            JB P1.1, CYCLE2      ; P1.1=1-&gt;CYCLE2&amp;P1.1=0-&gt;R1=4</span><br><span class="line">            MOV R1, #4           </span><br><span class="line">            SJMP EXIT</span><br><span class="line">CYCLE2: MOV R1, #1 </span><br><span class="line">        SJMP EXIT</span><br><span class="line">        </span><br><span class="line">EXIT:RETI</span><br><span class="line">     END</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <categories>
@@ -90,26 +114,6 @@
       </tags>
   </entry>
   <entry>
-    <title>AT89S52_test6</title>
-    <url>/2024/07/22/AT89S52-test6/</url>
-    <content><![CDATA[<h2 id="实验六-A-D-D-A-实验"><a href="#实验六-A-D-D-A-实验" class="headerlink" title="实验六 A&#x2F;D D&#x2F;A 实验"></a>实验六 A&#x2F;D D&#x2F;A 实验</h2><h3 id="test-6-1"><a href="#test-6-1" class="headerlink" title="test 6_1"></a>test 6_1</h3><p>A&#x2F;D实验<br>用AT89S52的MCU驱动ADC0809进行模数转换。程序启动时，由8个LED显示AD0809通道0的电压值（以二进制数形式）。<br>接线方法：实验书P108硬件连接表（忽略数码管部分，将P1口连至LED处）</p>
-<img src="AT89S52-test6/image-20240722150702777.png" alt="image-20240722150702777" style="zoom: 50%;" />
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">EOC 	BIT 	P3.0</span><br><span class="line"></span><br><span class="line">ORG 	0000H</span><br><span class="line">LJMP	MAIN</span><br><span class="line">ORG		0100H</span><br><span class="line"></span><br><span class="line">MAIN:	</span><br><span class="line">	MOV	A,#0FFH</span><br><span class="line">	MOV P0,A</span><br><span class="line">	MOV A,#00H</span><br><span class="line">	MOV P2,A</span><br><span class="line"></span><br><span class="line">LOOP:</span><br><span class="line">	MOV DPTR,#7FFFH ;选择P2.7（若给P2口赋全0，则接线时可以选取P2口的任意一位接片选信号CS）</span><br><span class="line">    MOV A,#00H ;任意值</span><br><span class="line">    MOVX @DPTR,A ;给AD一个写操作，启动转换</span><br><span class="line">    JNB EOC,$ ;等待转换结束</span><br><span class="line">	MOVX A,@DPTR ;将转换结果读入A       </span><br><span class="line">    MOV	P1,A ;将转换结果从P1输出</span><br><span class="line">	LJMP LOOP</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-6-2"><a href="#test-6-2" class="headerlink" title="test 6_2"></a>test 6_2</h3><p>D&#x2F;A实验<br>实现D&#x2F;A接口设计，编写程序输出占空比为1&#x2F;3的方波、锯齿波、三角波、正弦波。<br>用2个开关控制输出波形的类型，使用示波器观察波形。</p>
-<p>接线方法：P0接数模转换区DB0-DB7，P2.7接数模转换区CS，P3.6接数模转换区WR。<br>示波器红表笔接DA输出，黑表笔接GND。<br>P3.2（INT0）、P3.3（INT1）各接一个拨码开关，初始时置为高。</p>
-<p>效果：11-锯齿波 10-三角波 01-方波 00-正弦波</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line"></span><br><span class="line">ORG 0003H</span><br><span class="line">LJMP INT0_ISR</span><br><span class="line"></span><br><span class="line">ORG 0013H</span><br><span class="line">LJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">ORG 0050H</span><br><span class="line">MAIN:</span><br><span class="line">MOV IE,#85H ;1000 0101，允许外部中断INT1和INT0，开中断总开关</span><br><span class="line">SETB PX1 ;设外部中断1为高优先级中断</span><br><span class="line">; TCON不作其他配置，保持复位时的全0（外部中断触发方式为低电平）</span><br><span class="line"></span><br><span class="line">;MOV R0 #02H ;为控制方波占空比而设置的计数变量</span><br><span class="line"></span><br><span class="line">SAWTOOTH: ;锯齿波</span><br><span class="line">CLR A</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">LOOP_SAWTOOTH:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">SJMP LOOP_SAWTOOTH</span><br><span class="line"></span><br><span class="line">INT0_ISR:	;P3.2所接的开关置为低时进入外部中断0</span><br><span class="line">SQUARE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">LOOP_SQUARE:</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;高电平 一段延时</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;低电平 两段延时</span><br><span class="line">ACALL DELAY</span><br><span class="line">JB P3.2,EXIT ;若P3.2所接的开关被置为高，则退出中断</span><br><span class="line">SJMP LOOP_SQUARE ;若P3.2所接的开关仍为低，则继续输出方波</span><br><span class="line"></span><br><span class="line">DELAY:</span><br><span class="line">MOV R7,#0FFH</span><br><span class="line">DJNZ R7,$</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">EXIT:</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">INT1_ISR:	;P3.3所接的开关置为低时进入外部中断1</span><br><span class="line">JB P3.2,TRIANGLE	;若P3.2所接的开关被置为高，则输出三角波。否则输出正弦波。</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line"></span><br><span class="line">SIN:</span><br><span class="line">MOV R1,#63 ;一个周期内输出64个点</span><br><span class="line">LOOP_SIN:</span><br><span class="line">MOV DPTR,#TAB</span><br><span class="line">MOV A,R1</span><br><span class="line">MOVC A,@A+DPTR</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">NOP	;延时，可根据实际情况更改</span><br><span class="line">DJNZ R1,LOOP_SIN</span><br><span class="line">SJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">TAB:	;正弦波数据表</span><br><span class="line">DB 80H,8CH,98H,0A5H,0B0H,0BCH,0C7H,0D1H</span><br><span class="line">DB 0DAH,0E2H,0EAH,0F0H,0F6H,0FAH,0FDH,0FFH</span><br><span class="line">DB 0FFH,0FFH,0FDH,0FAH,0F6H,0F0H,0EAH,0E3H</span><br><span class="line">DB 0DAH,0D1H,0C7H,0BCH,0B1H,0A5H,99H,8CH</span><br><span class="line">DB 80H,73H,67H,5BH,4FH,43H,39H,2EH</span><br><span class="line">DB 25H,1DH,15H,0FH,09H,05H,02H,00H</span><br><span class="line">DB 00H,00H,02H,05H,09H,0EH,15H,1CH</span><br><span class="line">DB 25H,2EH,38H,43H,4EH,5AH,66H,73H</span><br><span class="line"></span><br><span class="line">TRIANGLE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">LOOP_TRIANGLE_INC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">CJNE A,#0FFH,LOOP_TRIANGLE_INC</span><br><span class="line">LOOP_TRIANGLE_DEC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">DEC A</span><br><span class="line">JNZ LOOP_TRIANGLE_DEC</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line">JNB P3.2,INT1_ISR	;若P3.2所接的开关被置为低，则进入中断服务程序1</span><br><span class="line">LJMP LOOP_TRIANGLE_INC</span><br><span class="line"></span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-      <tags>
-        <tag>AT89S52</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>AT89S52_test7</title>
     <url>/2024/07/24/AT89S52-test7/</url>
     <content><![CDATA[<h2 id="实验七-综合实验-（定时器控制方式）"><a href="#实验七-综合实验-（定时器控制方式）" class="headerlink" title="实验七 综合实验 （定时器控制方式）"></a>实验七 综合实验 （定时器控制方式）</h2><h3 id="test-7-1"><a href="#test-7-1" class="headerlink" title="test 7_1"></a>test 7_1</h3><p>用 P1 口作为输出口实现循环彩灯。（至少要有 5 种形式） </p>
@@ -131,21 +135,17 @@
       </tags>
   </entry>
   <entry>
-    <title>AT89S52_test5</title>
-    <url>/2024/07/22/AT89S52-test5/</url>
-    <content><![CDATA[<h2 id="实验五-计数器实验"><a href="#实验五-计数器实验" class="headerlink" title="实验五 计数器实验"></a>实验五 计数器实验</h2><h3 id="test-5-1"><a href="#test-5-1" class="headerlink" title="test 5_1"></a>test 5_1</h3><p>采用定时器与计数器相结合的方法使P1.7所接的发光二极管亮1秒、灭1秒，周而复始。<br>用三种组合实现：①查询方式+中断方式；②查询方式+查询方式；③中断方式+中断方式。</p>
-<p>接线方法：P1.7接一LED，P3.5（T1输入）接P1.0（周期为100ms的方波输出）</p>
-<p>①查询方式+中断方式<br>T1计数10，T0计时50ms<br>T1采用查询，T0采用中断</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 ;SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	</span><br><span class="line">	CHECK: 			;查询T1是否有中断溢出请求</span><br><span class="line">	JBC TF1,HANDLE	;若中断请求标志位TF1为1，则将其清零并跳转到处理程序</span><br><span class="line">	SJMP CHECK</span><br><span class="line">	</span><br><span class="line">	HANDLE:			;若T1有中断溢出请求，则取反P1.7</span><br><span class="line">	CPL P1.7</span><br><span class="line">	SJMP CHECK</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI	</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+    <title>AT89S52_test6</title>
+    <url>/2024/07/22/AT89S52-test6/</url>
+    <content><![CDATA[<h2 id="实验六-A-D-D-A-实验"><a href="#实验六-A-D-D-A-实验" class="headerlink" title="实验六 A&#x2F;D D&#x2F;A 实验"></a>实验六 A&#x2F;D D&#x2F;A 实验</h2><h3 id="test-6-1"><a href="#test-6-1" class="headerlink" title="test 6_1"></a>test 6_1</h3><p>A&#x2F;D实验<br>用AT89S52的MCU驱动ADC0809进行模数转换。程序启动时，由8个LED显示AD0809通道0的电压值（以二进制数形式）。<br>接线方法：实验书P108硬件连接表（忽略数码管部分，将P1口连至LED处）</p>
+<img src="AT89S52-test6/image-20240722150702777.png" alt="image-20240722150702777" style="zoom: 50%;" />
 
-<h3 id="test-5-2"><a href="#test-5-2" class="headerlink" title="test 5_2"></a>test 5_2</h3><p>②查询方式+查询方式<br>T1、T0皆采用查询</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	 ORG 0030H</span><br><span class="line">	 MAIN:</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 SETB P1.0 ;设P1.0初始为高电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB TR1 ;启动T1（定时）</span><br><span class="line">	 </span><br><span class="line">	 LABEL1:</span><br><span class="line">	 CPL P1.7</span><br><span class="line">	 </span><br><span class="line">	 LABEL2:</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 SETB TR0 ;启动T0（计数）</span><br><span class="line">	 </span><br><span class="line">	 LABEL3:</span><br><span class="line">	 JBC TF0,LABEL4 ;若50ms到了，则将中断请求标志位TF0清零并跳转LABEL4（翻转P1.0）</span><br><span class="line">	 SJMP LABEL3 ;50ms未到，继续查询中断请求标志位TF0状态</span><br><span class="line">	 </span><br><span class="line">	 LABEL4:</span><br><span class="line">	 CPL P1.0</span><br><span class="line">	 JBC TF1,LABEL1 ;若1s到了，则将中断请求标志位TF1清零并跳转LABEL1（翻转P1.7）</span><br><span class="line">	 AJMP LABEL2 ;某一个50ms到了，但1s没到，回到LABEL2对T0进行重装载</span><br><span class="line">	</span><br><span class="line">	 END</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">EOC 	BIT 	P3.0</span><br><span class="line"></span><br><span class="line">ORG 	0000H</span><br><span class="line">LJMP	MAIN</span><br><span class="line">ORG		0100H</span><br><span class="line"></span><br><span class="line">MAIN:	</span><br><span class="line">	MOV	A,#0FFH</span><br><span class="line">	MOV P0,A</span><br><span class="line">	MOV A,#00H</span><br><span class="line">	MOV P2,A</span><br><span class="line"></span><br><span class="line">LOOP:</span><br><span class="line">	MOV DPTR,#7FFFH ;选择P2.7（若给P2口赋全0，则接线时可以选取P2口的任意一位接片选信号CS）</span><br><span class="line">    MOV A,#00H ;任意值</span><br><span class="line">    MOVX @DPTR,A ;给AD一个写操作，启动转换</span><br><span class="line">    JNB EOC,$ ;等待转换结束</span><br><span class="line">	MOVX A,@DPTR ;将转换结果读入A       </span><br><span class="line">    MOV	P1,A ;将转换结果从P1输出</span><br><span class="line">	LJMP LOOP</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
 
-<h3 id="test-5-3"><a href="#test-5-3" class="headerlink" title="test 5_3"></a>test 5_3</h3><p>③中断方式+中断方式<br>T1、T0皆采用中断</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	CPL P1.7</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-5-4"><a href="#test-5-4" class="headerlink" title="test 5_4"></a>test 5_4</h3><p>输入计数脉冲，将计数脉冲的个数显示出来（小于15次），循环往复<br>接线方法：P1口接八个LED，P3.5（T1输入）接按钮（按下一次，产生一个脉冲）</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">;采用T1进行计数</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV TMOD,#60H ;0110 0000：设置T1为计数器，方式2</span><br><span class="line">	 MOV TH1,#0FFH ;按下一次按钮，进入一次中断</span><br><span class="line">	 MOV TL1,#0FFH</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	 CJNE A,#0FH,INCA ;若脉冲个数未到15个，则A直接加1</span><br><span class="line">	 MOV A,#0 ;若脉冲个数已到15个，则从零开始计数</span><br><span class="line">INCA:INC A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">     RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+<h3 id="test-6-2"><a href="#test-6-2" class="headerlink" title="test 6_2"></a>test 6_2</h3><p>D&#x2F;A实验<br>实现D&#x2F;A接口设计，编写程序输出占空比为1&#x2F;3的方波、锯齿波、三角波、正弦波。<br>用2个开关控制输出波形的类型，使用示波器观察波形。</p>
+<p>接线方法：P0接数模转换区DB0-DB7，P2.7接数模转换区CS，P3.6接数模转换区WR。<br>示波器红表笔接DA输出，黑表笔接GND。<br>P3.2（INT0）、P3.3（INT1）各接一个拨码开关，初始时置为高。</p>
+<p>效果：11-锯齿波 10-三角波 01-方波 00-正弦波</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line"></span><br><span class="line">ORG 0003H</span><br><span class="line">LJMP INT0_ISR</span><br><span class="line"></span><br><span class="line">ORG 0013H</span><br><span class="line">LJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">ORG 0050H</span><br><span class="line">MAIN:</span><br><span class="line">MOV IE,#85H ;1000 0101，允许外部中断INT1和INT0，开中断总开关</span><br><span class="line">SETB PX1 ;设外部中断1为高优先级中断</span><br><span class="line">; TCON不作其他配置，保持复位时的全0（外部中断触发方式为低电平）</span><br><span class="line"></span><br><span class="line">;MOV R0 #02H ;为控制方波占空比而设置的计数变量</span><br><span class="line"></span><br><span class="line">SAWTOOTH: ;锯齿波</span><br><span class="line">CLR A</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">LOOP_SAWTOOTH:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">SJMP LOOP_SAWTOOTH</span><br><span class="line"></span><br><span class="line">INT0_ISR:	;P3.2所接的开关置为低时进入外部中断0</span><br><span class="line">SQUARE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">LOOP_SQUARE:</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;高电平 一段延时</span><br><span class="line">CPL A</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">ACALL DELAY ;低电平 两段延时</span><br><span class="line">ACALL DELAY</span><br><span class="line">JB P3.2,EXIT ;若P3.2所接的开关被置为高，则退出中断</span><br><span class="line">SJMP LOOP_SQUARE ;若P3.2所接的开关仍为低，则继续输出方波</span><br><span class="line"></span><br><span class="line">DELAY:</span><br><span class="line">MOV R7,#0FFH</span><br><span class="line">DJNZ R7,$</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">EXIT:</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">INT1_ISR:	;P3.3所接的开关置为低时进入外部中断1</span><br><span class="line">JB P3.2,TRIANGLE	;若P3.2所接的开关被置为高，则输出三角波。否则输出正弦波。</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line"></span><br><span class="line">SIN:</span><br><span class="line">MOV R1,#63 ;一个周期内输出64个点</span><br><span class="line">LOOP_SIN:</span><br><span class="line">MOV DPTR,#TAB</span><br><span class="line">MOV A,R1</span><br><span class="line">MOVC A,@A+DPTR</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">NOP	;延时，可根据实际情况更改</span><br><span class="line">DJNZ R1,LOOP_SIN</span><br><span class="line">SJMP INT1_ISR</span><br><span class="line"></span><br><span class="line">TAB:	;正弦波数据表</span><br><span class="line">DB 80H,8CH,98H,0A5H,0B0H,0BCH,0C7H,0D1H</span><br><span class="line">DB 0DAH,0E2H,0EAH,0F0H,0F6H,0FAH,0FDH,0FFH</span><br><span class="line">DB 0FFH,0FFH,0FDH,0FAH,0F6H,0F0H,0EAH,0E3H</span><br><span class="line">DB 0DAH,0D1H,0C7H,0BCH,0B1H,0A5H,99H,8CH</span><br><span class="line">DB 80H,73H,67H,5BH,4FH,43H,39H,2EH</span><br><span class="line">DB 25H,1DH,15H,0FH,09H,05H,02H,00H</span><br><span class="line">DB 00H,00H,02H,05H,09H,0EH,15H,1CH</span><br><span class="line">DB 25H,2EH,38H,43H,4EH,5AH,66H,73H</span><br><span class="line"></span><br><span class="line">TRIANGLE:</span><br><span class="line">MOV DPTR,#7FFFH</span><br><span class="line">CLR A	;对A清零</span><br><span class="line">LOOP_TRIANGLE_INC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">INC A</span><br><span class="line">CJNE A,#0FFH,LOOP_TRIANGLE_INC</span><br><span class="line">LOOP_TRIANGLE_DEC:</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">DEC A</span><br><span class="line">JNZ LOOP_TRIANGLE_DEC</span><br><span class="line">JB P3.3,EXIT	;若P3.3所接的开关被置为高，则退出中断</span><br><span class="line">JNB P3.2,INT1_ISR	;若P3.2所接的开关被置为低，则进入中断服务程序1</span><br><span class="line">LJMP LOOP_TRIANGLE_INC</span><br><span class="line"></span><br><span class="line">END</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>AT89S52</category>
@@ -196,6 +196,70 @@
       <tags>
         <tag>hexo blog</tag>
         <tag>解决方法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>实验七-数据完整性与安全性实验</title>
+    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/</url>
+    <content><![CDATA[<h1 id="实验七-数据完整性与安全性实验"><a href="#实验七-数据完整性与安全性实验" class="headerlink" title="实验七 数据完整性与安全性实验"></a>实验七 数据完整性与安全性实验</h1><h2 id="1-数据库安全性实验"><a href="#1-数据库安全性实验" class="headerlink" title="1)数据库安全性实验"></a>1)数据库安全性实验</h2><p>在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。</p>
+<h3 id="1-设置服务器安全认证模式"><a href="#1-设置服务器安全认证模式" class="headerlink" title="(1)设置服务器安全认证模式"></a>(1)设置服务器安全认证模式</h3><p>在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。</p>
+<h3 id="2-建立用户和角色"><a href="#2-建立用户和角色" class="headerlink" title="(2)建立用户和角色"></a>(2)建立用户和角色</h3><p>I)为正在使用的SQL服务建立新登录名(名为”login1”)，使用SQL Server身份验证。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png" alt="image-20240607083259464" style="zoom: 50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018663.png" alt="image-20240607083440586"></p>
+<p>II)在学生课程库中，新建数据库用户名为”user1”(登名为”login1”)，新建学生课程数据库角色名为”rose1”。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018664.png" alt="image-20240607083814148" style="zoom:50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018665.png" alt="image-20240607084213226"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018666.png" alt="image-20240608203007823"></p>
+<p>iii)在图书读者数据库中，新建数据库用户名为”user2”(登录名为”login1”)，新建数据库角色名为”rose2”。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018667.png" alt="image-20240607085017218" style="zoom:50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018668.png" alt="image-20240607085640830"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018669.png" alt="image-20240608203118085"></p>
+<h3 id="3-设置权限"><a href="#3-设置权限" class="headerlink" title="(3)设置权限"></a>(3)设置权限</h3><p>I)使新登录”login1”加入到System Administrators服务器角色中，可访问学生课程数据库和图书读者数据库。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018670.png" alt="image-20240608202522076" style="zoom:50%;" />
+
+<p>II)在学生课程数据库中，将”user1”加人”rose1”和db-owner，通过选择角色对”rose1”授权。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018671.png" alt="image-20240608203355668" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018672.png" alt="image-20240608203858426" style="zoom:50%;" />
+
+<p>iii)在图书读者数据库中，将”user2”加人”rose2”和db-owner，通过对象(选择图书、读者和借阅表)对”rose2”授权。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018673.png" alt="image-20240608204915010" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018674.png" alt="image-20240608205218109" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018675.png" alt="image-20240608205316712" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018676.png" alt="image-20240608205359980" style="zoom:50%;" />
+
+<p>iv)使”rose2”和”rose1”都有创建表、创建视图和备份数据库的权限。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018677.png" alt="image-20240608204706205"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018678.png" alt="image-20240608204803511"></p>
+<h2 id="2-数据库完整性实验"><a href="#2-数据库完整性实验" class="headerlink" title="2)数据库完整性实验"></a>2)数据库完整性实验</h2><p>使用Transact-SQL设计触发器，通过SQL Server Management Studio定义它们。</p>
+<p>建立学生选课库中选课表的插入数据型触发器，保证学生选课库中选课表的参照完整性，以维护其外码与参照表中的主码一致。该实验的T-SQL参考代码如下。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018679.png" alt="image-20240608211632363"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018680.png" alt="image-20240608212352892"></p>
+<h2 id="3）数据库应用程序设计"><a href="#3）数据库应用程序设计" class="headerlink" title="3）数据库应用程序设计"></a>3）数据库应用程序设计</h2><p>1、自行设计数据库；<br>2、设计相关窗体能对数据库进行查询、浏览等基本操作。</p>
+<h3 id="（1）医院信息查询系统主界面"><a href="#（1）医院信息查询系统主界面" class="headerlink" title="（1）医院信息查询系统主界面"></a>（1）医院信息查询系统主界面</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018681.png" alt="image-20240609085056527" style="zoom: 50%;" />
+
+<h3 id="（2）医生信息查询"><a href="#（2）医生信息查询" class="headerlink" title="（2）医生信息查询"></a>（2）医生信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018682.png" alt="image-20240608221743915" style="zoom:33%;" />
+
+<h3 id="（3）患者信息查询"><a href="#（3）患者信息查询" class="headerlink" title="（3）患者信息查询"></a>（3）患者信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018683.png" alt="image-20240608221812733" style="zoom:33%;" />
+
+<h3 id="（4）病历查询"><a href="#（4）病历查询" class="headerlink" title="（4）病历查询"></a>（4）病历查询</h3><h4 id="i-根据患者编号查询"><a href="#i-根据患者编号查询" class="headerlink" title="i.根据患者编号查询"></a>i.根据患者编号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018684.png" alt="image-20240608221912606" style="zoom:33%;" />
+
+<h4 id="ii-根据医生工号查询"><a href="#ii-根据医生工号查询" class="headerlink" title="ii.根据医生工号查询"></a>ii.根据医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018685.png" alt="image-20240608221949165" style="zoom:33%;" />
+
+<h4 id="iii-同时使用患者号、医生工号查询"><a href="#iii-同时使用患者号、医生工号查询" class="headerlink" title="iii.同时使用患者号、医生工号查询"></a>iii.同时使用患者号、医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018686.png" alt="image-20240608222114538" style="zoom:33%;" />
+
+<h4 id="iv-模糊查询"><a href="#iv-模糊查询" class="headerlink" title="iv.模糊查询"></a>iv.模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018687.png" alt="image-20240608222143465" style="zoom:33%;" />]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>数据库</tag>
       </tags>
   </entry>
   <entry>
@@ -328,70 +392,6 @@
 </ul>
 <p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506230957119.png" alt="image-20240510152021435"></p>
 ]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>数据库</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>实验七-数据完整性与安全性实验</title>
-    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/</url>
-    <content><![CDATA[<h1 id="实验七-数据完整性与安全性实验"><a href="#实验七-数据完整性与安全性实验" class="headerlink" title="实验七 数据完整性与安全性实验"></a>实验七 数据完整性与安全性实验</h1><h2 id="1-数据库安全性实验"><a href="#1-数据库安全性实验" class="headerlink" title="1)数据库安全性实验"></a>1)数据库安全性实验</h2><p>在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。</p>
-<h3 id="1-设置服务器安全认证模式"><a href="#1-设置服务器安全认证模式" class="headerlink" title="(1)设置服务器安全认证模式"></a>(1)设置服务器安全认证模式</h3><p>在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。</p>
-<h3 id="2-建立用户和角色"><a href="#2-建立用户和角色" class="headerlink" title="(2)建立用户和角色"></a>(2)建立用户和角色</h3><p>I)为正在使用的SQL服务建立新登录名(名为”login1”)，使用SQL Server身份验证。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png" alt="image-20240607083259464" style="zoom: 50%;" />
-
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018663.png" alt="image-20240607083440586"></p>
-<p>II)在学生课程库中，新建数据库用户名为”user1”(登名为”login1”)，新建学生课程数据库角色名为”rose1”。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018664.png" alt="image-20240607083814148" style="zoom:50%;" />
-
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018665.png" alt="image-20240607084213226"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018666.png" alt="image-20240608203007823"></p>
-<p>iii)在图书读者数据库中，新建数据库用户名为”user2”(登录名为”login1”)，新建数据库角色名为”rose2”。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018667.png" alt="image-20240607085017218" style="zoom:50%;" />
-
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018668.png" alt="image-20240607085640830"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018669.png" alt="image-20240608203118085"></p>
-<h3 id="3-设置权限"><a href="#3-设置权限" class="headerlink" title="(3)设置权限"></a>(3)设置权限</h3><p>I)使新登录”login1”加入到System Administrators服务器角色中，可访问学生课程数据库和图书读者数据库。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018670.png" alt="image-20240608202522076" style="zoom:50%;" />
-
-<p>II)在学生课程数据库中，将”user1”加人”rose1”和db-owner，通过选择角色对”rose1”授权。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018671.png" alt="image-20240608203355668" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018672.png" alt="image-20240608203858426" style="zoom:50%;" />
-
-<p>iii)在图书读者数据库中，将”user2”加人”rose2”和db-owner，通过对象(选择图书、读者和借阅表)对”rose2”授权。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018673.png" alt="image-20240608204915010" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018674.png" alt="image-20240608205218109" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018675.png" alt="image-20240608205316712" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018676.png" alt="image-20240608205359980" style="zoom:50%;" />
-
-<p>iv)使”rose2”和”rose1”都有创建表、创建视图和备份数据库的权限。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018677.png" alt="image-20240608204706205"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018678.png" alt="image-20240608204803511"></p>
-<h2 id="2-数据库完整性实验"><a href="#2-数据库完整性实验" class="headerlink" title="2)数据库完整性实验"></a>2)数据库完整性实验</h2><p>使用Transact-SQL设计触发器，通过SQL Server Management Studio定义它们。</p>
-<p>建立学生选课库中选课表的插入数据型触发器，保证学生选课库中选课表的参照完整性，以维护其外码与参照表中的主码一致。该实验的T-SQL参考代码如下。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018679.png" alt="image-20240608211632363"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018680.png" alt="image-20240608212352892"></p>
-<h2 id="3）数据库应用程序设计"><a href="#3）数据库应用程序设计" class="headerlink" title="3）数据库应用程序设计"></a>3）数据库应用程序设计</h2><p>1、自行设计数据库；<br>2、设计相关窗体能对数据库进行查询、浏览等基本操作。</p>
-<h3 id="（1）医院信息查询系统主界面"><a href="#（1）医院信息查询系统主界面" class="headerlink" title="（1）医院信息查询系统主界面"></a>（1）医院信息查询系统主界面</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018681.png" alt="image-20240609085056527" style="zoom: 50%;" />
-
-<h3 id="（2）医生信息查询"><a href="#（2）医生信息查询" class="headerlink" title="（2）医生信息查询"></a>（2）医生信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018682.png" alt="image-20240608221743915" style="zoom:33%;" />
-
-<h3 id="（3）患者信息查询"><a href="#（3）患者信息查询" class="headerlink" title="（3）患者信息查询"></a>（3）患者信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018683.png" alt="image-20240608221812733" style="zoom:33%;" />
-
-<h3 id="（4）病历查询"><a href="#（4）病历查询" class="headerlink" title="（4）病历查询"></a>（4）病历查询</h3><h4 id="i-根据患者编号查询"><a href="#i-根据患者编号查询" class="headerlink" title="i.根据患者编号查询"></a>i.根据患者编号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018684.png" alt="image-20240608221912606" style="zoom:33%;" />
-
-<h4 id="ii-根据医生工号查询"><a href="#ii-根据医生工号查询" class="headerlink" title="ii.根据医生工号查询"></a>ii.根据医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018685.png" alt="image-20240608221949165" style="zoom:33%;" />
-
-<h4 id="iii-同时使用患者号、医生工号查询"><a href="#iii-同时使用患者号、医生工号查询" class="headerlink" title="iii.同时使用患者号、医生工号查询"></a>iii.同时使用患者号、医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018686.png" alt="image-20240608222114538" style="zoom:33%;" />
-
-<h4 id="iv-模糊查询"><a href="#iv-模糊查询" class="headerlink" title="iv.模糊查询"></a>iv.模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018687.png" alt="image-20240608222143465" style="zoom:33%;" />]]></content>
       <categories>
         <category>数据库</category>
       </categories>
@@ -603,52 +603,27 @@
       </tags>
   </entry>
   <entry>
-    <title>实验六-数据库的视图和关系图的定义及使用实验</title>
-    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E5%85%AD-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E8%A7%86%E5%9B%BE%E5%92%8C%E5%85%B3%E7%B3%BB%E5%9B%BE%E7%9A%84%E5%AE%9A%E4%B9%89%E5%8F%8A%E4%BD%BF%E7%94%A8%E5%AE%9E%E9%AA%8C/</url>
-    <content><![CDATA[<h1 id="实验六-数据库的视图和关系图的定义及使用实验"><a href="#实验六-数据库的视图和关系图的定义及使用实验" class="headerlink" title="实验六 数据库的视图和关系图的定义及使用实验"></a>实验六 数据库的视图和关系图的定义及使用实验</h1><h2 id="一、基本操作实验"><a href="#一、基本操作实验" class="headerlink" title="一、基本操作实验"></a>一、基本操作实验</h2><h3 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h3><p>1)创建、查看、修改和删除视图。</p>
-<p>2)创建、编辑和删除数据库关系图。</p>
-<h4 id="1-创建视图实验"><a href="#1-创建视图实验" class="headerlink" title="1) 创建视图实验"></a>1) 创建视图实验</h4><p>(1) 在 SQL Server Management Studio中，选中图书读者数据库下的视图对象，调出创建视图工具，在图书_读者库中按下列Transact-SQL描述创建读者视图。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020389.png" alt="image-20240608193740720"></p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020390.png" alt="image-20240608181610560" style="zoom:50%;" />
+    <title>树莓派启用root用户</title>
+    <url>/2025/06/26/%E6%A0%91%E8%8E%93%E6%B4%BE%E5%90%AF%E7%94%A8root%E7%94%A8%E6%88%B7/</url>
+    <content><![CDATA[<h2 id="树莓派启用root账户"><a href="#树莓派启用root账户" class="headerlink" title="树莓派启用root账户"></a>树莓派启用root账户</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo passwd root </span><br></pre></td></tr></table></figure>
 
+<p>执行后提示设置密码，输入2遍确认。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo passwd --unlock root</span><br></pre></td></tr></table></figure>
 
+<p>解锁root账户。</p>
+<blockquote>
+<p>如需再次锁定，将<code>unlock</code>改成<code>lock</code>即可。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">su</span><br></pre></td></tr></table></figure>
 
-
-
-
-
-<p>(2) 在SQL Server Management Studio 中，选中图书读者数据库下的视图对象，调出创建视图工具，按下列Transact-SQL描述的视图定义，创建借阅_计算机图书视图</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020391.png" alt="image-20240608194037539"></p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020392.png" alt="image-20240608194226956" style="zoom:50%;" />
-
-<h4 id="2-创建数据库关系图实验"><a href="#2-创建数据库关系图实验" class="headerlink" title="2) 创建数据库关系图实验"></a>2) 创建数据库关系图实验</h4><p>在SQL Server Management Studio中，选中<code>图书_读者数据库</code>下的数据库关系图对象，调出创建关系图工具，完成在<code>图书_读者数据库</code>中建立一个<code>图书_借阅关系图</code>操作。要求该关系图包括图书和借阅两个表，并符合表达式“图书.书号&#x3D;借阅.书号”的外码约束。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020393.png" alt="image-20240608195426025" style="zoom:50%;" />
-
-
-
-
-
-<h2 id="二、选做内容"><a href="#二、选做内容" class="headerlink" title="二、选做内容"></a>二、选做内容</h2><p>利用C#的数据库组件设计一个小型数据库应用系统。</p>
-<h4 id="1）学生课程查询系统-主界面"><a href="#1）学生课程查询系统-主界面" class="headerlink" title="1）学生课程查询系统-主界面"></a>1）学生课程查询系统-主界面</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020394.png" alt="image-20240608195533745" style="zoom:50%;" />
-
-<h4 id="2）所有学生信息查询"><a href="#2）所有学生信息查询" class="headerlink" title="2）所有学生信息查询"></a>2）所有学生信息查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020395.png" alt="image-20240608195603716" style="zoom: 33%;" />
-
-<h4 id="3）所有课程信息查询"><a href="#3）所有课程信息查询" class="headerlink" title="3）所有课程信息查询"></a>3）所有课程信息查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020396.png" alt="image-20240608195639973" style="zoom: 33%;" />
-
-<h4 id="4）选课信息查询界面"><a href="#4）选课信息查询界面" class="headerlink" title="4）选课信息查询界面"></a>4）选课信息查询界面</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020397.png" alt="image-20240608195721645" style="zoom: 33%;" />
-
-<h4 id="5）按学号查询"><a href="#5）按学号查询" class="headerlink" title="5）按学号查询"></a>5）按学号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020398.png" alt="image-20240608195745357" style="zoom: 33%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020400.png" alt="image-20240608195808689" style="zoom: 33%;" />
-
-<h4 id="6）模糊查询"><a href="#6）模糊查询" class="headerlink" title="6）模糊查询"></a>6）模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020401.png" alt="image-20240608195822689" style="zoom: 33%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020402.png" alt="image-20240608200105572" style="zoom: 33%;" />]]></content>
+<p>输入刚设置的密码，进入root账户。</p>
+]]></content>
       <categories>
-        <category>数据库</category>
+        <category>树莓派</category>
       </categories>
       <tags>
-        <tag>数据库</tag>
+        <tag>树莓派</tag>
+        <tag>Raspberry Pi</tag>
       </tags>
   </entry>
   <entry>
@@ -727,27 +702,71 @@
       </tags>
   </entry>
   <entry>
-    <title>树莓派启用root用户</title>
-    <url>/2025/06/26/%E6%A0%91%E8%8E%93%E6%B4%BE%E5%90%AF%E7%94%A8root%E7%94%A8%E6%88%B7/</url>
-    <content><![CDATA[<h2 id="树莓派启用root账户"><a href="#树莓派启用root账户" class="headerlink" title="树莓派启用root账户"></a>树莓派启用root账户</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo passwd root </span><br></pre></td></tr></table></figure>
-
-<p>执行后提示设置密码，输入2遍确认。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo passwd --unlock root</span><br></pre></td></tr></table></figure>
-
-<p>解锁root账户。</p>
-<blockquote>
-<p>如需再次锁定，将<code>unlock</code>改成<code>lock</code>即可。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">su</span><br></pre></td></tr></table></figure>
-
-<p>输入刚设置的密码，进入root账户。</p>
+    <title>笔记本电脑扬声器不发声的解决方法</title>
+    <url>/2025/07/03/%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E6%89%AC%E5%A3%B0%E5%99%A8%E4%B8%8D%E5%8F%91%E5%A3%B0%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<h1 id="笔记本电脑扬声器不发声的解决方法"><a href="#笔记本电脑扬声器不发声的解决方法" class="headerlink" title="笔记本电脑扬声器不发声的解决方法"></a>笔记本电脑扬声器不发声的解决方法</h1><ol>
+<li><p><code>Win</code>+<code>R</code>打开运行对话框，输入<code>services.msc</code>，回车。<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507031536568.png" alt="image-20250703153312973"></p>
+</li>
+<li><p>在服务列表中找到<code>Windows Audio</code>，右键点击，选择重新启动。</p>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507031536569.png" alt="image-20250703153521488"></p>
 ]]></content>
       <categories>
-        <category>树莓派</category>
+        <category>踩坑记录</category>
       </categories>
       <tags>
-        <tag>树莓派</tag>
-        <tag>Raspberry Pi</tag>
+        <tag>解决方法</tag>
+        <tag>笔记本电脑</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>实验六-数据库的视图和关系图的定义及使用实验</title>
+    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E5%85%AD-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E8%A7%86%E5%9B%BE%E5%92%8C%E5%85%B3%E7%B3%BB%E5%9B%BE%E7%9A%84%E5%AE%9A%E4%B9%89%E5%8F%8A%E4%BD%BF%E7%94%A8%E5%AE%9E%E9%AA%8C/</url>
+    <content><![CDATA[<h1 id="实验六-数据库的视图和关系图的定义及使用实验"><a href="#实验六-数据库的视图和关系图的定义及使用实验" class="headerlink" title="实验六 数据库的视图和关系图的定义及使用实验"></a>实验六 数据库的视图和关系图的定义及使用实验</h1><h2 id="一、基本操作实验"><a href="#一、基本操作实验" class="headerlink" title="一、基本操作实验"></a>一、基本操作实验</h2><h3 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h3><p>1)创建、查看、修改和删除视图。</p>
+<p>2)创建、编辑和删除数据库关系图。</p>
+<h4 id="1-创建视图实验"><a href="#1-创建视图实验" class="headerlink" title="1) 创建视图实验"></a>1) 创建视图实验</h4><p>(1) 在 SQL Server Management Studio中，选中图书读者数据库下的视图对象，调出创建视图工具，在图书_读者库中按下列Transact-SQL描述创建读者视图。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020389.png" alt="image-20240608193740720"></p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020390.png" alt="image-20240608181610560" style="zoom:50%;" />
+
+
+
+
+
+
+
+<p>(2) 在SQL Server Management Studio 中，选中图书读者数据库下的视图对象，调出创建视图工具，按下列Transact-SQL描述的视图定义，创建借阅_计算机图书视图</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020391.png" alt="image-20240608194037539"></p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020392.png" alt="image-20240608194226956" style="zoom:50%;" />
+
+<h4 id="2-创建数据库关系图实验"><a href="#2-创建数据库关系图实验" class="headerlink" title="2) 创建数据库关系图实验"></a>2) 创建数据库关系图实验</h4><p>在SQL Server Management Studio中，选中<code>图书_读者数据库</code>下的数据库关系图对象，调出创建关系图工具，完成在<code>图书_读者数据库</code>中建立一个<code>图书_借阅关系图</code>操作。要求该关系图包括图书和借阅两个表，并符合表达式“图书.书号&#x3D;借阅.书号”的外码约束。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020393.png" alt="image-20240608195426025" style="zoom:50%;" />
+
+
+
+
+
+<h2 id="二、选做内容"><a href="#二、选做内容" class="headerlink" title="二、选做内容"></a>二、选做内容</h2><p>利用C#的数据库组件设计一个小型数据库应用系统。</p>
+<h4 id="1）学生课程查询系统-主界面"><a href="#1）学生课程查询系统-主界面" class="headerlink" title="1）学生课程查询系统-主界面"></a>1）学生课程查询系统-主界面</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020394.png" alt="image-20240608195533745" style="zoom:50%;" />
+
+<h4 id="2）所有学生信息查询"><a href="#2）所有学生信息查询" class="headerlink" title="2）所有学生信息查询"></a>2）所有学生信息查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020395.png" alt="image-20240608195603716" style="zoom: 33%;" />
+
+<h4 id="3）所有课程信息查询"><a href="#3）所有课程信息查询" class="headerlink" title="3）所有课程信息查询"></a>3）所有课程信息查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020396.png" alt="image-20240608195639973" style="zoom: 33%;" />
+
+<h4 id="4）选课信息查询界面"><a href="#4）选课信息查询界面" class="headerlink" title="4）选课信息查询界面"></a>4）选课信息查询界面</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020397.png" alt="image-20240608195721645" style="zoom: 33%;" />
+
+<h4 id="5）按学号查询"><a href="#5）按学号查询" class="headerlink" title="5）按学号查询"></a>5）按学号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020398.png" alt="image-20240608195745357" style="zoom: 33%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020400.png" alt="image-20240608195808689" style="zoom: 33%;" />
+
+<h4 id="6）模糊查询"><a href="#6）模糊查询" class="headerlink" title="6）模糊查询"></a>6）模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020401.png" alt="image-20240608195822689" style="zoom: 33%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020402.png" alt="image-20240608200105572" style="zoom: 33%;" />]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>数据库</tag>
       </tags>
   </entry>
   <entry>
@@ -812,25 +831,6 @@
 <ol start="8">
 <li>若窗口不闪动，说明配置可能未更改成功。此时根据以上步骤，更改7.中任意一属性的值，点击确定，再重复一样的步骤将值改回原样。重复这种行为，直到点击<code>确定</code>时观察到窗口闪动。</li>
 </ol>
-]]></content>
-      <categories>
-        <category>踩坑记录</category>
-      </categories>
-      <tags>
-        <tag>解决方法</tag>
-        <tag>笔记本电脑</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>笔记本电脑扬声器不发声的解决方法</title>
-    <url>/2025/07/03/%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E6%89%AC%E5%A3%B0%E5%99%A8%E4%B8%8D%E5%8F%91%E5%A3%B0%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
-    <content><![CDATA[<h1 id="笔记本电脑扬声器不发声的解决方法"><a href="#笔记本电脑扬声器不发声的解决方法" class="headerlink" title="笔记本电脑扬声器不发声的解决方法"></a>笔记本电脑扬声器不发声的解决方法</h1><ol>
-<li><p><code>Win</code>+<code>R</code>打开运行对话框，输入<code>services.msc</code>，回车。<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507031536568.png" alt="image-20250703153312973"></p>
-</li>
-<li><p>在服务列表中找到<code>Windows Audio</code>，右键点击，选择重新启动。</p>
-</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507031536569.png" alt="image-20250703153521488"></p>
 ]]></content>
       <categories>
         <category>踩坑记录</category>
