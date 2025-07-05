@@ -1,35 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>AT89S52_test1</title>
-    <url>/2024/07/22/AT89S52-test1/</url>
-    <content><![CDATA[<h2 id="写在最前面"><a href="#写在最前面" class="headerlink" title="写在最前面"></a>写在最前面</h2><p>本分类内使用的单片机皆为AT89S52，外接晶振频率为11.059MHz。</p>
-<h2 id="实验一-验证实验"><a href="#实验一-验证实验" class="headerlink" title="实验一 验证实验"></a>实验一 验证实验</h2><h3 id="test-1-1"><a href="#test-1-1" class="headerlink" title="test 1_1"></a>test 1_1</h3><p>将外部数据存储器0000H-0010H中的内容传送到片内数据存储器60H-70H单元。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV DPTR,#0000H</span><br><span class="line">MOV R0,#60H</span><br><span class="line">LOOP:</span><br><span class="line">MOVX A,@DPTR</span><br><span class="line">MOVX @R0,A</span><br><span class="line">INC DPTR</span><br><span class="line">INC R0</span><br><span class="line">CJNE R0 ,#71H,LOOP</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-1-2"><a href="#test-1-2" class="headerlink" title="test 1_2"></a>test 1_2</h3><p>程序跳转表</p>
-<p>(1)运行程序,打开数据窗口,观察地址 30H、31H、32H、33H的数据变化。用键盘输入改变地址 30H、31H、32H、33H 的值，观察其实验效果。修改源程序中给30H~33H的赋值，观察实验效果。</p>
-<p>(2)打开CPU窗口，选择单步或跟踪执行方式运行程序，观察CPU窗口各寄存器的变化。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0</span><br><span class="line">LJMP START // 改动此处，改变的是赋值</span><br><span class="line">FUNC0:MOV 30H,#0</span><br><span class="line">RET</span><br><span class="line">FUNC1:MOV 31H,#1</span><br><span class="line">RET</span><br><span class="line">FUNC2:MOV 32H,#2</span><br><span class="line">RET</span><br><span class="line">FUNC3:MOV 33H,#3</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">FUNCENTER:</span><br><span class="line">ADD A,ACC // AJMP是一个2字节指令，故A需要乘以2，使得程序在JMP指令中跳转到正确的位置</span><br><span class="line">MOV DPTR,#FUNCTAB</span><br><span class="line">JMP @A+DPTR</span><br><span class="line"></span><br><span class="line">FUNCTAB:</span><br><span class="line">AJMP FUNC0</span><br><span class="line">AJMP FUNC1</span><br><span class="line">AJMP FUNC2</span><br><span class="line">AJMP FUNC3</span><br><span class="line"></span><br><span class="line">START:</span><br><span class="line">MOV A,#0</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#1</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#2</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#3</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">LJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-1-3"><a href="#test-1-3" class="headerlink" title="test 1_3"></a>test 1_3</h3><h4 id="test1-3-1"><a href="#test1-3-1" class="headerlink" title="test1_3_1"></a>test1_3_1</h4><p>教材第55页5题。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#56H</span><br><span class="line">ADD A,#74H ; CAH+CAH = 194H，高位舍弃</span><br><span class="line">ADD A,ACC</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h4 id="test1-3-2"><a href="#test1-3-2" class="headerlink" title="test1_3_2"></a>test1_3_2</h4><p>教材第55页7题。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV 59H,#50H</span><br><span class="line">MOV A,59H</span><br><span class="line">MOV R0,A</span><br><span class="line">MOV A,#0</span><br><span class="line">MOV @R0,A</span><br><span class="line">MOV A,#25H</span><br><span class="line">MOV 51H,A</span><br><span class="line">MOV 52H,#70H</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h4 id="test1-3-3"><a href="#test1-3-3" class="headerlink" title="test1_3_3"></a>test1_3_3</h4><p>教材第55页8题。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV SP,#60H</span><br><span class="line">MOV 30H,#24H</span><br><span class="line">MOV 31H,#10H</span><br><span class="line">PUSH 30H</span><br><span class="line">PUSH 31H</span><br><span class="line">POP DPL</span><br><span class="line">POP DPH</span><br><span class="line">MOV A,#00H</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">SJMP $</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-      <tags>
-        <tag>AT89S52</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>AT89S52_test2</title>
     <url>/2024/07/22/AT89S52-test2/</url>
     <content><![CDATA[<h2 id="实验二-并行接口输入输出实验"><a href="#实验二-并行接口输入输出实验" class="headerlink" title="实验二 并行接口输入输出实验"></a>实验二 并行接口输入输出实验</h2><h3 id="test-2-1"><a href="#test-2-1" class="headerlink" title="test 2_1"></a>test 2_1</h3><p>选用输出口接八只发光二极管，编写程序，使发光二极管循环点亮（采用软件延时）<br>接线方法：使用P1口连接LED</p>
@@ -38,27 +9,6 @@
 <h3 id="test-2-2"><a href="#test-2-2" class="headerlink" title="test 2_2"></a>test 2_2</h3><p>采用一个输入口和一个输出口，将开关的状态反映在发光二极管上<br>接线方法：P1口接开关，P0口接LED</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">LOOP:</span><br><span class="line">ORL P1,#0FFH ;读P1口之前先对其写1</span><br><span class="line">MOV A,P1 ;将P1口状态（按键状态）读入A</span><br><span class="line">MOV P0,A ;将按键状态送至P0，使其在LED上反映出来</span><br><span class="line">SJMP LOOP</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
 ]]></content>
-      <categories>
-        <category>AT89S52</category>
-      </categories>
-      <tags>
-        <tag>AT89S52</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>AT89S52_test3</title>
-    <url>/2024/07/22/AT89S52-test3/</url>
-    <content><![CDATA[<h2 id="实验三-外部中断实验"><a href="#实验三-外部中断实验" class="headerlink" title="实验三 外部中断实验"></a>实验三 外部中断实验</h2><h3 id="test-3-1"><a href="#test-3-1" class="headerlink" title="test 3_1"></a>test 3_1</h3><p>通过外部中断使P1口的开关控制8个发光二极管，开始是P1.0所接的灯亮，以后每中断一次，下一个灯亮，顺序左移，周而复始。</p>
-<p>接线方法：P0口接8个LED，P3.2接信号发生器（输出方波）红表笔，任找一低电平接黑表笔</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FEH </span><br><span class="line">MOV P1,A ;P1.0所接的灯亮</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">SJMP $</span><br><span class="line">INTERRUPT1:</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">RETI</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-3-2"><a href="#test-3-2" class="headerlink" title="test 3_2"></a>test 3_2</h3><p>外部中断控制P1口连接的8个发光二极管，同时亮，或同时灭，每中断一次，变反一次</p>
-<p>接线方法：P1口接8个LED，P3.2接信号发生器（输出方波）红表笔，任找一低电平接黑表笔</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH </span><br><span class="line">MOV P1,A ;开始灯全灭</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">SJMP $</span><br><span class="line">INTERRUPT1:</span><br><span class="line">CPL A</span><br><span class="line">MOV P1,A</span><br><span class="line">RETI</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
-
-<h3 id="test-3-3"><a href="#test-3-3" class="headerlink" title="test 3_3"></a>test 3_3</h3><p>外部中断控制P1口连接的8个发光二极管。<br>中断第一次，8个发光二极管循环点亮；<br>中断第二次，8个发光二极管逐个点亮；<br>中断第三次，8个发光二极管高四位和低四位交替亮灭。<br>如此循环往复。</p>
-<p>接线方法：P1口接8个LED，P3.2接按键</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">	</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">	</span><br><span class="line">ORG 0030H</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH</span><br><span class="line">MOV P1,A ;开始灯全灭</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">RELOAD:MOV R3,#03H ;计数变量</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A ;点亮P1.0所接的灯</span><br><span class="line">	</span><br><span class="line">LOOP0:</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#03,LOOP1</span><br><span class="line">SJMP LOOP0</span><br><span class="line">	</span><br><span class="line">LOOP1:</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A</span><br><span class="line">MOV R4,#00H</span><br><span class="line">ACALL DELAY</span><br><span class="line">LOOP11:</span><br><span class="line">ADD A,ACC</span><br><span class="line">MOV P1,A</span><br><span class="line">INC R4 ;计算是否满8次</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#02,LOOP2</span><br><span class="line">CJNE R4,#08H,LOOP11 ;不满8次，继续逐个点亮</span><br><span class="line">SJMP LOOP1 ;满8次，重新从全灭开始逐个点亮</span><br><span class="line">	</span><br><span class="line">LOOP2:</span><br><span class="line">MOV A,#0FH</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CPL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#01,RELOAD</span><br><span class="line">SJMP LOOP2</span><br><span class="line">	</span><br><span class="line">INTERRUPT1:</span><br><span class="line">DEC R3 ;R3减一</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">DELAY: MOV R0,#0AH</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$ </span><br><span class="line">DJNZ R1,DELAY2 </span><br><span class="line">DJNZ R0,DELAY1 </span><br><span class="line">RET</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>AT89S52</category>
       </categories>
@@ -90,22 +40,48 @@
       </tags>
   </entry>
   <entry>
-    <title>AT89S52_test5</title>
-    <url>/2024/07/22/AT89S52-test5/</url>
-    <content><![CDATA[<h2 id="实验五-计数器实验"><a href="#实验五-计数器实验" class="headerlink" title="实验五 计数器实验"></a>实验五 计数器实验</h2><h3 id="test-5-1"><a href="#test-5-1" class="headerlink" title="test 5_1"></a>test 5_1</h3><p>采用定时器与计数器相结合的方法使P1.7所接的发光二极管亮1秒、灭1秒，周而复始。<br>用三种组合实现：①查询方式+中断方式；②查询方式+查询方式；③中断方式+中断方式。</p>
-<p>接线方法：P1.7接一LED，P3.5（T1输入）接P1.0（周期为100ms的方波输出）</p>
-<p>①查询方式+中断方式<br>T1计数10，T0计时50ms<br>T1采用查询，T0采用中断</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 ;SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	</span><br><span class="line">	CHECK: 			;查询T1是否有中断溢出请求</span><br><span class="line">	JBC TF1,HANDLE	;若中断请求标志位TF1为1，则将其清零并跳转到处理程序</span><br><span class="line">	SJMP CHECK</span><br><span class="line">	</span><br><span class="line">	HANDLE:			;若T1有中断溢出请求，则取反P1.7</span><br><span class="line">	CPL P1.7</span><br><span class="line">	SJMP CHECK</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI	</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+    <title>AT89S52_test1</title>
+    <url>/2024/07/22/AT89S52-test1/</url>
+    <content><![CDATA[<h2 id="写在最前面"><a href="#写在最前面" class="headerlink" title="写在最前面"></a>写在最前面</h2><p>本分类内使用的单片机皆为AT89S52，外接晶振频率为11.059MHz。</p>
+<h2 id="实验一-验证实验"><a href="#实验一-验证实验" class="headerlink" title="实验一 验证实验"></a>实验一 验证实验</h2><h3 id="test-1-1"><a href="#test-1-1" class="headerlink" title="test 1_1"></a>test 1_1</h3><p>将外部数据存储器0000H-0010H中的内容传送到片内数据存储器60H-70H单元。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV DPTR,#0000H</span><br><span class="line">MOV R0,#60H</span><br><span class="line">LOOP:</span><br><span class="line">MOVX A,@DPTR</span><br><span class="line">MOVX @R0,A</span><br><span class="line">INC DPTR</span><br><span class="line">INC R0</span><br><span class="line">CJNE R0 ,#71H,LOOP</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
 
-<h3 id="test-5-2"><a href="#test-5-2" class="headerlink" title="test 5_2"></a>test 5_2</h3><p>②查询方式+查询方式<br>T1、T0皆采用查询</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	 ORG 0030H</span><br><span class="line">	 MAIN:</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 SETB P1.0 ;设P1.0初始为高电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB TR1 ;启动T1（定时）</span><br><span class="line">	 </span><br><span class="line">	 LABEL1:</span><br><span class="line">	 CPL P1.7</span><br><span class="line">	 </span><br><span class="line">	 LABEL2:</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 SETB TR0 ;启动T0（计数）</span><br><span class="line">	 </span><br><span class="line">	 LABEL3:</span><br><span class="line">	 JBC TF0,LABEL4 ;若50ms到了，则将中断请求标志位TF0清零并跳转LABEL4（翻转P1.0）</span><br><span class="line">	 SJMP LABEL3 ;50ms未到，继续查询中断请求标志位TF0状态</span><br><span class="line">	 </span><br><span class="line">	 LABEL4:</span><br><span class="line">	 CPL P1.0</span><br><span class="line">	 JBC TF1,LABEL1 ;若1s到了，则将中断请求标志位TF1清零并跳转LABEL1（翻转P1.7）</span><br><span class="line">	 AJMP LABEL2 ;某一个50ms到了，但1s没到，回到LABEL2对T0进行重装载</span><br><span class="line">	</span><br><span class="line">	 END</span><br></pre></td></tr></table></figure>
+<h3 id="test-1-2"><a href="#test-1-2" class="headerlink" title="test 1_2"></a>test 1_2</h3><p>程序跳转表</p>
+<p>(1)运行程序,打开数据窗口,观察地址 30H、31H、32H、33H的数据变化。用键盘输入改变地址 30H、31H、32H、33H 的值，观察其实验效果。修改源程序中给30H~33H的赋值，观察实验效果。</p>
+<p>(2)打开CPU窗口，选择单步或跟踪执行方式运行程序，观察CPU窗口各寄存器的变化。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0</span><br><span class="line">LJMP START // 改动此处，改变的是赋值</span><br><span class="line">FUNC0:MOV 30H,#0</span><br><span class="line">RET</span><br><span class="line">FUNC1:MOV 31H,#1</span><br><span class="line">RET</span><br><span class="line">FUNC2:MOV 32H,#2</span><br><span class="line">RET</span><br><span class="line">FUNC3:MOV 33H,#3</span><br><span class="line">RET</span><br><span class="line"></span><br><span class="line">FUNCENTER:</span><br><span class="line">ADD A,ACC // AJMP是一个2字节指令，故A需要乘以2，使得程序在JMP指令中跳转到正确的位置</span><br><span class="line">MOV DPTR,#FUNCTAB</span><br><span class="line">JMP @A+DPTR</span><br><span class="line"></span><br><span class="line">FUNCTAB:</span><br><span class="line">AJMP FUNC0</span><br><span class="line">AJMP FUNC1</span><br><span class="line">AJMP FUNC2</span><br><span class="line">AJMP FUNC3</span><br><span class="line"></span><br><span class="line">START:</span><br><span class="line">MOV A,#0</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#1</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#2</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">MOV A,#3</span><br><span class="line">CALL FUNCENTER</span><br><span class="line">LJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
 
-<h3 id="test-5-3"><a href="#test-5-3" class="headerlink" title="test 5_3"></a>test 5_3</h3><p>③中断方式+中断方式<br>T1、T0皆采用中断</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	CPL P1.7</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+<h3 id="test-1-3"><a href="#test-1-3" class="headerlink" title="test 1_3"></a>test 1_3</h3><h4 id="test1-3-1"><a href="#test1-3-1" class="headerlink" title="test1_3_1"></a>test1_3_1</h4><p>教材第55页5题。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV A,#56H</span><br><span class="line">ADD A,#74H ; CAH+CAH = 194H，高位舍弃</span><br><span class="line">ADD A,ACC</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
 
-<h3 id="test-5-4"><a href="#test-5-4" class="headerlink" title="test 5_4"></a>test 5_4</h3><p>输入计数脉冲，将计数脉冲的个数显示出来（小于15次），循环往复<br>接线方法：P1口接八个LED，P3.5（T1输入）接按钮（按下一次，产生一个脉冲）</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">;采用T1进行计数</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV TMOD,#60H ;0110 0000：设置T1为计数器，方式2</span><br><span class="line">	 MOV TH1,#0FFH ;按下一次按钮，进入一次中断</span><br><span class="line">	 MOV TL1,#0FFH</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	 CJNE A,#0FH,INCA ;若脉冲个数未到15个，则A直接加1</span><br><span class="line">	 MOV A,#0 ;若脉冲个数已到15个，则从零开始计数</span><br><span class="line">INCA:INC A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">     RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+<h4 id="test1-3-2"><a href="#test1-3-2" class="headerlink" title="test1_3_2"></a>test1_3_2</h4><p>教材第55页7题。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV 59H,#50H</span><br><span class="line">MOV A,59H</span><br><span class="line">MOV R0,A</span><br><span class="line">MOV A,#0</span><br><span class="line">MOV @R0,A</span><br><span class="line">MOV A,#25H</span><br><span class="line">MOV 51H,A</span><br><span class="line">MOV 52H,#70H</span><br><span class="line">SJMP $</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h4 id="test1-3-3"><a href="#test1-3-3" class="headerlink" title="test1_3_3"></a>test1_3_3</h4><p>教材第55页8题。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">MOV SP,#60H</span><br><span class="line">MOV 30H,#24H</span><br><span class="line">MOV 31H,#10H</span><br><span class="line">PUSH 30H</span><br><span class="line">PUSH 31H</span><br><span class="line">POP DPL</span><br><span class="line">POP DPH</span><br><span class="line">MOV A,#00H</span><br><span class="line">MOVX @DPTR,A</span><br><span class="line">SJMP $</span><br></pre></td></tr></table></figure>
+
 ]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+      <tags>
+        <tag>AT89S52</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AT89S52_test3</title>
+    <url>/2024/07/22/AT89S52-test3/</url>
+    <content><![CDATA[<h2 id="实验三-外部中断实验"><a href="#实验三-外部中断实验" class="headerlink" title="实验三 外部中断实验"></a>实验三 外部中断实验</h2><h3 id="test-3-1"><a href="#test-3-1" class="headerlink" title="test 3_1"></a>test 3_1</h3><p>通过外部中断使P1口的开关控制8个发光二极管，开始是P1.0所接的灯亮，以后每中断一次，下一个灯亮，顺序左移，周而复始。</p>
+<p>接线方法：P0口接8个LED，P3.2接信号发生器（输出方波）红表笔，任找一低电平接黑表笔</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FEH </span><br><span class="line">MOV P1,A ;P1.0所接的灯亮</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">SJMP $</span><br><span class="line">INTERRUPT1:</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">RETI</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-3-2"><a href="#test-3-2" class="headerlink" title="test 3_2"></a>test 3_2</h3><p>外部中断控制P1口连接的8个发光二极管，同时亮，或同时灭，每中断一次，变反一次</p>
+<p>接线方法：P1口接8个LED，P3.2接信号发生器（输出方波）红表笔，任找一低电平接黑表笔</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH </span><br><span class="line">MOV P1,A ;开始灯全灭</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">SJMP $</span><br><span class="line">INTERRUPT1:</span><br><span class="line">CPL A</span><br><span class="line">MOV P1,A</span><br><span class="line">RETI</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-3-3"><a href="#test-3-3" class="headerlink" title="test 3_3"></a>test 3_3</h3><p>外部中断控制P1口连接的8个发光二极管。<br>中断第一次，8个发光二极管循环点亮；<br>中断第二次，8个发光二极管逐个点亮；<br>中断第三次，8个发光二极管高四位和低四位交替亮灭。<br>如此循环往复。</p>
+<p>接线方法：P1口接8个LED，P3.2接按键</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">AJMP MAIN</span><br><span class="line">	</span><br><span class="line">ORG 0003H ;INT0入口</span><br><span class="line">AJMP INTERRUPT1</span><br><span class="line">	</span><br><span class="line">ORG 0030H</span><br><span class="line">MAIN:</span><br><span class="line">MOV A,#0FFH</span><br><span class="line">MOV P1,A ;开始灯全灭</span><br><span class="line">SETB IT0 ;边沿触发中断</span><br><span class="line">SETB EX0 ;允许INT0中断</span><br><span class="line">SETB EA ;开中断总开关</span><br><span class="line">RELOAD:MOV R3,#03H ;计数变量</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A ;点亮P1.0所接的灯</span><br><span class="line">	</span><br><span class="line">LOOP0:</span><br><span class="line">RL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#03,LOOP1</span><br><span class="line">SJMP LOOP0</span><br><span class="line">	</span><br><span class="line">LOOP1:</span><br><span class="line">MOV A,#0FEH</span><br><span class="line">MOV P1,A</span><br><span class="line">MOV R4,#00H</span><br><span class="line">ACALL DELAY</span><br><span class="line">LOOP11:</span><br><span class="line">ADD A,ACC</span><br><span class="line">MOV P1,A</span><br><span class="line">INC R4 ;计算是否满8次</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#02,LOOP2</span><br><span class="line">CJNE R4,#08H,LOOP11 ;不满8次，继续逐个点亮</span><br><span class="line">SJMP LOOP1 ;满8次，重新从全灭开始逐个点亮</span><br><span class="line">	</span><br><span class="line">LOOP2:</span><br><span class="line">MOV A,#0FH</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CPL A</span><br><span class="line">MOV P1,A</span><br><span class="line">ACALL DELAY</span><br><span class="line">CJNE R3,#01,RELOAD</span><br><span class="line">SJMP LOOP2</span><br><span class="line">	</span><br><span class="line">INTERRUPT1:</span><br><span class="line">DEC R3 ;R3减一</span><br><span class="line">RETI</span><br><span class="line"></span><br><span class="line">DELAY: MOV R0,#0AH</span><br><span class="line">DELAY1: MOV R1,#00H</span><br><span class="line">DELAY2: MOV R2,#0C3H</span><br><span class="line">DJNZ R2,$ </span><br><span class="line">DJNZ R1,DELAY2 </span><br><span class="line">DJNZ R0,DELAY1 </span><br><span class="line">RET</span><br><span class="line">	</span><br><span class="line">END</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>AT89S52</category>
       </categories>
@@ -155,6 +131,30 @@
       </tags>
   </entry>
   <entry>
+    <title>AT89S52_test5</title>
+    <url>/2024/07/22/AT89S52-test5/</url>
+    <content><![CDATA[<h2 id="实验五-计数器实验"><a href="#实验五-计数器实验" class="headerlink" title="实验五 计数器实验"></a>实验五 计数器实验</h2><h3 id="test-5-1"><a href="#test-5-1" class="headerlink" title="test 5_1"></a>test 5_1</h3><p>采用定时器与计数器相结合的方法使P1.7所接的发光二极管亮1秒、灭1秒，周而复始。<br>用三种组合实现：①查询方式+中断方式；②查询方式+查询方式；③中断方式+中断方式。</p>
+<p>接线方法：P1.7接一LED，P3.5（T1输入）接P1.0（周期为100ms的方波输出）</p>
+<p>①查询方式+中断方式<br>T1计数10，T0计时50ms<br>T1采用查询，T0采用中断</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 ;SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	</span><br><span class="line">	CHECK: 			;查询T1是否有中断溢出请求</span><br><span class="line">	JBC TF1,HANDLE	;若中断请求标志位TF1为1，则将其清零并跳转到处理程序</span><br><span class="line">	SJMP CHECK</span><br><span class="line">	</span><br><span class="line">	HANDLE:			;若T1有中断溢出请求，则取反P1.7</span><br><span class="line">	CPL P1.7</span><br><span class="line">	SJMP CHECK</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI	</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-2"><a href="#test-5-2" class="headerlink" title="test 5_2"></a>test 5_2</h3><p>②查询方式+查询方式<br>T1、T0皆采用查询</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	 ORG 0030H</span><br><span class="line">	 MAIN:</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 SETB P1.0 ;设P1.0初始为高电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB TR1 ;启动T1（定时）</span><br><span class="line">	 </span><br><span class="line">	 LABEL1:</span><br><span class="line">	 CPL P1.7</span><br><span class="line">	 </span><br><span class="line">	 LABEL2:</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 SETB TR0 ;启动T0（计数）</span><br><span class="line">	 </span><br><span class="line">	 LABEL3:</span><br><span class="line">	 JBC TF0,LABEL4 ;若50ms到了，则将中断请求标志位TF0清零并跳转LABEL4（翻转P1.0）</span><br><span class="line">	 SJMP LABEL3 ;50ms未到，继续查询中断请求标志位TF0状态</span><br><span class="line">	 </span><br><span class="line">	 LABEL4:</span><br><span class="line">	 CPL P1.0</span><br><span class="line">	 JBC TF1,LABEL1 ;若1s到了，则将中断请求标志位TF1清零并跳转LABEL1（翻转P1.7）</span><br><span class="line">	 AJMP LABEL2 ;某一个50ms到了，但1s没到，回到LABEL2对T0进行重装载</span><br><span class="line">	</span><br><span class="line">	 END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-3"><a href="#test-5-3" class="headerlink" title="test 5_3"></a>test 5_3</h3><p>③中断方式+中断方式<br>T1、T0皆采用中断</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 000BH ;T0中断服务程序入口</span><br><span class="line">	SJMP T0_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR P1.0 ;设P1.0初始为低电平（为输出周期为100ms的方波做准备）</span><br><span class="line">	 CLR P1.7 ;设P1.7初始为低电平（LED点亮）</span><br><span class="line">	 MOV TMOD,#61H ;0110 0001：设置T1为计数器，方式2；设置T0为定时器，方式1</span><br><span class="line">	 MOV TH0,#4CH</span><br><span class="line">	 MOV TL0,#01H</span><br><span class="line">	 MOV TH1,#0F6H</span><br><span class="line">	 MOV TL1,#0F6H</span><br><span class="line">	 SETB ET0 ;允许T0中断</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR0 ;启动T0</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T0中断服务程序</span><br><span class="line">	T0_ISR:</span><br><span class="line">	CPL P1.0</span><br><span class="line">	MOV TH0,#4CH ;重装载</span><br><span class="line">	MOV TL0,#01H</span><br><span class="line">    RETI</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	CPL P1.7</span><br><span class="line">    RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+
+<h3 id="test-5-4"><a href="#test-5-4" class="headerlink" title="test 5_4"></a>test 5_4</h3><p>输入计数脉冲，将计数脉冲的个数显示出来（小于15次），循环往复<br>接线方法：P1口接八个LED，P3.5（T1输入）接按钮（按下一次，产生一个脉冲）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">;采用T1进行计数</span><br><span class="line"></span><br><span class="line">ORG 0000H</span><br><span class="line">	SJMP MAIN</span><br><span class="line">	</span><br><span class="line">	ORG 001BH ;T1中断服务程序入口</span><br><span class="line">	SJMP T1_ISR</span><br><span class="line">	</span><br><span class="line">	ORG 0030H</span><br><span class="line">	MAIN:</span><br><span class="line">	 CLR A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV TMOD,#60H ;0110 0000：设置T1为计数器，方式2</span><br><span class="line">	 MOV TH1,#0FFH ;按下一次按钮，进入一次中断</span><br><span class="line">	 MOV TL1,#0FFH</span><br><span class="line">	 SETB ET1 ;允许T1中断</span><br><span class="line">	 SETB TR1 ;启动T1</span><br><span class="line">	 SETB EA ;开中断总开关</span><br><span class="line">	 SJMP $</span><br><span class="line"></span><br><span class="line">;T1中断服务程序</span><br><span class="line">	; T1采用方式2，无需重装载</span><br><span class="line">	T1_ISR:</span><br><span class="line">	 CJNE A,#0FH,INCA ;若脉冲个数未到15个，则A直接加1</span><br><span class="line">	 MOV A,#0 ;若脉冲个数已到15个，则从零开始计数</span><br><span class="line">INCA:INC A</span><br><span class="line">	 CPL A</span><br><span class="line">	 MOV P1,A</span><br><span class="line">	 CPL A</span><br><span class="line">     RETI</span><br><span class="line">	</span><br><span class="line">	END</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>AT89S52</category>
+      </categories>
+      <tags>
+        <tag>AT89S52</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>AT89S52_test8</title>
     <url>/2024/07/24/AT89S52-test8/</url>
     <content><![CDATA[<h2 id="实验八-综合实验-十字路口交通灯"><a href="#实验八-综合实验-十字路口交通灯" class="headerlink" title="实验八 综合实验 十字路口交通灯"></a>实验八 综合实验 十字路口交通灯</h2><p>南北红灯（D1、D7）亮维持15秒，在南北红灯亮的同时东西绿灯（D5、D11）也亮，并维持10s。<br>到10s时，东西绿灯（D5、D11）闪亮，闪亮3s后熄灭。<br>在东西绿灯（D5、D11）熄灭时，东西黄灯（D6、D12）亮，并维持2秒。<br>到2秒时，东西黄灯（D6、D12）熄灭，东西红灯（D4、D10）亮，同时南北红灯（D1、D7）熄灭，绿灯（D2、D8）亮。</p>
@@ -179,6 +179,24 @@
             <i class="fa fa-quote-right"></i>
           </blockquote>
 ]]></content>
+  </entry>
+  <entry>
+    <title>hexo blog本地预览与部署不一致解决方法</title>
+    <url>/2024/07/25/hexo%20blog%E6%9C%AC%E5%9C%B0%E9%A2%84%E8%A7%88%E4%B8%8E%E9%83%A8%E7%BD%B2%E4%B8%8D%E4%B8%80%E8%87%B4%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<h1 id="hexo-blog本地预览与部署不一致解决方法"><a href="#hexo-blog本地预览与部署不一致解决方法" class="headerlink" title="hexo blog本地预览与部署不一致解决方法"></a>hexo blog本地预览与部署不一致解决方法</h1><ul>
+<li>本地新添了博文，使用<code>hexo server</code>查看，一切正常。</li>
+<li><code>hexo d</code>，但显示<code>nothing to commit, working tree clean</code>？</li>
+<li>解决方法：<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo generate</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>踩坑记录</category>
+        <category>搭建Blog踩坑记录</category>
+      </categories>
+      <tags>
+        <tag>hexo blog</tag>
+        <tag>解决方法</tag>
+      </tags>
   </entry>
   <entry>
     <title>实验一_数据库定义实验</title>
@@ -318,6 +336,70 @@
       </tags>
   </entry>
   <entry>
+    <title>实验七-数据完整性与安全性实验</title>
+    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/</url>
+    <content><![CDATA[<h1 id="实验七-数据完整性与安全性实验"><a href="#实验七-数据完整性与安全性实验" class="headerlink" title="实验七 数据完整性与安全性实验"></a>实验七 数据完整性与安全性实验</h1><h2 id="1-数据库安全性实验"><a href="#1-数据库安全性实验" class="headerlink" title="1)数据库安全性实验"></a>1)数据库安全性实验</h2><p>在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。</p>
+<h3 id="1-设置服务器安全认证模式"><a href="#1-设置服务器安全认证模式" class="headerlink" title="(1)设置服务器安全认证模式"></a>(1)设置服务器安全认证模式</h3><p>在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。</p>
+<h3 id="2-建立用户和角色"><a href="#2-建立用户和角色" class="headerlink" title="(2)建立用户和角色"></a>(2)建立用户和角色</h3><p>I)为正在使用的SQL服务建立新登录名(名为”login1”)，使用SQL Server身份验证。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png" alt="image-20240607083259464" style="zoom: 50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018663.png" alt="image-20240607083440586"></p>
+<p>II)在学生课程库中，新建数据库用户名为”user1”(登名为”login1”)，新建学生课程数据库角色名为”rose1”。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018664.png" alt="image-20240607083814148" style="zoom:50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018665.png" alt="image-20240607084213226"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018666.png" alt="image-20240608203007823"></p>
+<p>iii)在图书读者数据库中，新建数据库用户名为”user2”(登录名为”login1”)，新建数据库角色名为”rose2”。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018667.png" alt="image-20240607085017218" style="zoom:50%;" />
+
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018668.png" alt="image-20240607085640830"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018669.png" alt="image-20240608203118085"></p>
+<h3 id="3-设置权限"><a href="#3-设置权限" class="headerlink" title="(3)设置权限"></a>(3)设置权限</h3><p>I)使新登录”login1”加入到System Administrators服务器角色中，可访问学生课程数据库和图书读者数据库。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018670.png" alt="image-20240608202522076" style="zoom:50%;" />
+
+<p>II)在学生课程数据库中，将”user1”加人”rose1”和db-owner，通过选择角色对”rose1”授权。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018671.png" alt="image-20240608203355668" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018672.png" alt="image-20240608203858426" style="zoom:50%;" />
+
+<p>iii)在图书读者数据库中，将”user2”加人”rose2”和db-owner，通过对象(选择图书、读者和借阅表)对”rose2”授权。</p>
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018673.png" alt="image-20240608204915010" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018674.png" alt="image-20240608205218109" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018675.png" alt="image-20240608205316712" style="zoom:50%;" />
+
+<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018676.png" alt="image-20240608205359980" style="zoom:50%;" />
+
+<p>iv)使”rose2”和”rose1”都有创建表、创建视图和备份数据库的权限。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018677.png" alt="image-20240608204706205"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018678.png" alt="image-20240608204803511"></p>
+<h2 id="2-数据库完整性实验"><a href="#2-数据库完整性实验" class="headerlink" title="2)数据库完整性实验"></a>2)数据库完整性实验</h2><p>使用Transact-SQL设计触发器，通过SQL Server Management Studio定义它们。</p>
+<p>建立学生选课库中选课表的插入数据型触发器，保证学生选课库中选课表的参照完整性，以维护其外码与参照表中的主码一致。该实验的T-SQL参考代码如下。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018679.png" alt="image-20240608211632363"></p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018680.png" alt="image-20240608212352892"></p>
+<h2 id="3）数据库应用程序设计"><a href="#3）数据库应用程序设计" class="headerlink" title="3）数据库应用程序设计"></a>3）数据库应用程序设计</h2><p>1、自行设计数据库；<br>2、设计相关窗体能对数据库进行查询、浏览等基本操作。</p>
+<h3 id="（1）医院信息查询系统主界面"><a href="#（1）医院信息查询系统主界面" class="headerlink" title="（1）医院信息查询系统主界面"></a>（1）医院信息查询系统主界面</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018681.png" alt="image-20240609085056527" style="zoom: 50%;" />
+
+<h3 id="（2）医生信息查询"><a href="#（2）医生信息查询" class="headerlink" title="（2）医生信息查询"></a>（2）医生信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018682.png" alt="image-20240608221743915" style="zoom:33%;" />
+
+<h3 id="（3）患者信息查询"><a href="#（3）患者信息查询" class="headerlink" title="（3）患者信息查询"></a>（3）患者信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018683.png" alt="image-20240608221812733" style="zoom:33%;" />
+
+<h3 id="（4）病历查询"><a href="#（4）病历查询" class="headerlink" title="（4）病历查询"></a>（4）病历查询</h3><h4 id="i-根据患者编号查询"><a href="#i-根据患者编号查询" class="headerlink" title="i.根据患者编号查询"></a>i.根据患者编号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018684.png" alt="image-20240608221912606" style="zoom:33%;" />
+
+<h4 id="ii-根据医生工号查询"><a href="#ii-根据医生工号查询" class="headerlink" title="ii.根据医生工号查询"></a>ii.根据医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018685.png" alt="image-20240608221949165" style="zoom:33%;" />
+
+<h4 id="iii-同时使用患者号、医生工号查询"><a href="#iii-同时使用患者号、医生工号查询" class="headerlink" title="iii.同时使用患者号、医生工号查询"></a>iii.同时使用患者号、医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018686.png" alt="image-20240608222114538" style="zoom:33%;" />
+
+<h4 id="iv-模糊查询"><a href="#iv-模糊查询" class="headerlink" title="iv.模糊查询"></a>iv.模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018687.png" alt="image-20240608222143465" style="zoom:33%;" />]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>数据库</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>实验三-数据库简单查询和连接查询实验</title>
     <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%89-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%80%E5%8D%95%E6%9F%A5%E8%AF%A2%E5%92%8C%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
     <content><![CDATA[<h1 id="实验三-数据库简单查询和连接查询实验"><a href="#实验三-数据库简单查询和连接查询实验" class="headerlink" title="实验三 数据库简单查询和连接查询实验"></a>实验三 数据库简单查询和连接查询实验</h1><h2 id="1、基本操作实验"><a href="#1、基本操作实验" class="headerlink" title="1、基本操作实验"></a>1、基本操作实验</h2><ul>
@@ -385,24 +467,6 @@
       </categories>
       <tags>
         <tag>数据库</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hexo blog本地预览与部署不一致解决方法</title>
-    <url>/2024/07/25/hexo%20blog%E6%9C%AC%E5%9C%B0%E9%A2%84%E8%A7%88%E4%B8%8E%E9%83%A8%E7%BD%B2%E4%B8%8D%E4%B8%80%E8%87%B4%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
-    <content><![CDATA[<h1 id="hexo-blog本地预览与部署不一致解决方法"><a href="#hexo-blog本地预览与部署不一致解决方法" class="headerlink" title="hexo blog本地预览与部署不一致解决方法"></a>hexo blog本地预览与部署不一致解决方法</h1><ul>
-<li>本地新添了博文，使用<code>hexo server</code>查看，一切正常。</li>
-<li><code>hexo d</code>，但显示<code>nothing to commit, working tree clean</code>？</li>
-<li>解决方法：<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo generate</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>踩坑记录</category>
-        <category>搭建Blog踩坑记录</category>
-      </categories>
-      <tags>
-        <tag>hexo blog</tag>
-        <tag>解决方法</tag>
       </tags>
   </entry>
   <entry>
@@ -509,62 +573,28 @@
       </tags>
   </entry>
   <entry>
-    <title>实验七-数据完整性与安全性实验</title>
-    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%B8%83-%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E4%B8%8E%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E9%AA%8C/</url>
-    <content><![CDATA[<h1 id="实验七-数据完整性与安全性实验"><a href="#实验七-数据完整性与安全性实验" class="headerlink" title="实验七 数据完整性与安全性实验"></a>实验七 数据完整性与安全性实验</h1><h2 id="1-数据库安全性实验"><a href="#1-数据库安全性实验" class="headerlink" title="1)数据库安全性实验"></a>1)数据库安全性实验</h2><p>在SQL Server Management Studio中，设置 SQL Server 的安全认证模式，实现对SQL Server的用户和角色管理，设置和管理数据操作权限。</p>
-<h3 id="1-设置服务器安全认证模式"><a href="#1-设置服务器安全认证模式" class="headerlink" title="(1)设置服务器安全认证模式"></a>(1)设置服务器安全认证模式</h3><p>在 SQL Server Management Studio 中，为正在使用的SQL服务器设置 Windows安全认证模式。</p>
-<h3 id="2-建立用户和角色"><a href="#2-建立用户和角色" class="headerlink" title="(2)建立用户和角色"></a>(2)建立用户和角色</h3><p>I)为正在使用的SQL服务建立新登录名(名为”login1”)，使用SQL Server身份验证。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018662.png" alt="image-20240607083259464" style="zoom: 50%;" />
-
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018663.png" alt="image-20240607083440586"></p>
-<p>II)在学生课程库中，新建数据库用户名为”user1”(登名为”login1”)，新建学生课程数据库角色名为”rose1”。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018664.png" alt="image-20240607083814148" style="zoom:50%;" />
-
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018665.png" alt="image-20240607084213226"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018666.png" alt="image-20240608203007823"></p>
-<p>iii)在图书读者数据库中，新建数据库用户名为”user2”(登录名为”login1”)，新建数据库角色名为”rose2”。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018667.png" alt="image-20240607085017218" style="zoom:50%;" />
-
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018668.png" alt="image-20240607085640830"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018669.png" alt="image-20240608203118085"></p>
-<h3 id="3-设置权限"><a href="#3-设置权限" class="headerlink" title="(3)设置权限"></a>(3)设置权限</h3><p>I)使新登录”login1”加入到System Administrators服务器角色中，可访问学生课程数据库和图书读者数据库。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018670.png" alt="image-20240608202522076" style="zoom:50%;" />
-
-<p>II)在学生课程数据库中，将”user1”加人”rose1”和db-owner，通过选择角色对”rose1”授权。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018671.png" alt="image-20240608203355668" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018672.png" alt="image-20240608203858426" style="zoom:50%;" />
-
-<p>iii)在图书读者数据库中，将”user2”加人”rose2”和db-owner，通过对象(选择图书、读者和借阅表)对”rose2”授权。</p>
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018673.png" alt="image-20240608204915010" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018674.png" alt="image-20240608205218109" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018675.png" alt="image-20240608205316712" style="zoom:50%;" />
-
-<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018676.png" alt="image-20240608205359980" style="zoom:50%;" />
-
-<p>iv)使”rose2”和”rose1”都有创建表、创建视图和备份数据库的权限。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018677.png" alt="image-20240608204706205"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018678.png" alt="image-20240608204803511"></p>
-<h2 id="2-数据库完整性实验"><a href="#2-数据库完整性实验" class="headerlink" title="2)数据库完整性实验"></a>2)数据库完整性实验</h2><p>使用Transact-SQL设计触发器，通过SQL Server Management Studio定义它们。</p>
-<p>建立学生选课库中选课表的插入数据型触发器，保证学生选课库中选课表的参照完整性，以维护其外码与参照表中的主码一致。该实验的T-SQL参考代码如下。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018679.png" alt="image-20240608211632363"></p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018680.png" alt="image-20240608212352892"></p>
-<h2 id="3）数据库应用程序设计"><a href="#3）数据库应用程序设计" class="headerlink" title="3）数据库应用程序设计"></a>3）数据库应用程序设计</h2><p>1、自行设计数据库；<br>2、设计相关窗体能对数据库进行查询、浏览等基本操作。</p>
-<h3 id="（1）医院信息查询系统主界面"><a href="#（1）医院信息查询系统主界面" class="headerlink" title="（1）医院信息查询系统主界面"></a>（1）医院信息查询系统主界面</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018681.png" alt="image-20240609085056527" style="zoom: 50%;" />
-
-<h3 id="（2）医生信息查询"><a href="#（2）医生信息查询" class="headerlink" title="（2）医生信息查询"></a>（2）医生信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018682.png" alt="image-20240608221743915" style="zoom:33%;" />
-
-<h3 id="（3）患者信息查询"><a href="#（3）患者信息查询" class="headerlink" title="（3）患者信息查询"></a>（3）患者信息查询</h3><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018683.png" alt="image-20240608221812733" style="zoom:33%;" />
-
-<h3 id="（4）病历查询"><a href="#（4）病历查询" class="headerlink" title="（4）病历查询"></a>（4）病历查询</h3><h4 id="i-根据患者编号查询"><a href="#i-根据患者编号查询" class="headerlink" title="i.根据患者编号查询"></a>i.根据患者编号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018684.png" alt="image-20240608221912606" style="zoom:33%;" />
-
-<h4 id="ii-根据医生工号查询"><a href="#ii-根据医生工号查询" class="headerlink" title="ii.根据医生工号查询"></a>ii.根据医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018685.png" alt="image-20240608221949165" style="zoom:33%;" />
-
-<h4 id="iii-同时使用患者号、医生工号查询"><a href="#iii-同时使用患者号、医生工号查询" class="headerlink" title="iii.同时使用患者号、医生工号查询"></a>iii.同时使用患者号、医生工号查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018686.png" alt="image-20240608222114538" style="zoom:33%;" />
-
-<h4 id="iv-模糊查询"><a href="#iv-模糊查询" class="headerlink" title="iv.模糊查询"></a>iv.模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231018687.png" alt="image-20240608222143465" style="zoom:33%;" />]]></content>
+    <title>实验五-数据库的组合与统计查询实验</title>
+    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%BA%94-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E7%BB%84%E5%90%88%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
+    <content><![CDATA[<h1 id="实验五-数据库的组合与统计查询实验"><a href="#实验五-数据库的组合与统计查询实验" class="headerlink" title="实验五 数据库的组合与统计查询实验"></a>实验五 数据库的组合与统计查询实验</h1><h3 id="实验题目和要求："><a href="#实验题目和要求：" class="headerlink" title="实验题目和要求："></a>实验题目和要求：</h3><p>检查并修改图书读者库的数据，使之与表10-8至表10-10的数据一致；<br>检查并修改学生课程库的数据，便之与表10-11至表10-13的数据一致；<br>将下列查询要求用T-SQL语句表示；<br>在SSMS的查询分析器中输人相应的T-SQL语旬，执行并在结果区中查看内容；<br>结果不正确时要对T-SQL语句修改，直到正确为止。</p>
+<h3 id="1-在图书读者数据库中，按下列要求查询"><a href="#1-在图书读者数据库中，按下列要求查询" class="headerlink" title="(1) 在图书读者数据库中，按下列要求查询"></a>(1) 在图书读者数据库中，按下列要求查询</h3><p>​	1)查找图书类别，要求类别中最高图书定价不低于全部按类别分组的平均定价的2倍。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020912.png" alt="image-20240606230329833"></p>
+<p>​	2)求机械工业出版社出版的各类图书的平均定价，用GROUP BY表示。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020913.png" alt="image-20240531082608255"></p>
+<p>​	3)列出计算机类图书的书号、名称及价格，最后求出册数和总价格。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020914.png"></p>
+<p>​	4)列出计算机类图书的书号、名称及价格，并求出各出版社这类书的总价格，最后求出全部册数和总价格。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020915.png"></p>
+<p>​	5)查询计算机类和机械工业出版社出版的图书。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020916.png" alt="image-20240531090152465"></p>
+<h3 id="2-在学生课程数据库中，按下列要求查询"><a href="#2-在学生课程数据库中，按下列要求查询" class="headerlink" title="(2) 在学生课程数据库中，按下列要求查询"></a>(2) 在学生课程数据库中，按下列要求查询</h3><p>​	1)求学生的总人数。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020917.png" alt="image-20240531090441230"></p>
+<p>​	2)求选修了课程的学生人数。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020918.png" alt="image-20240531090657034"></p>
+<p>​	3)求课程和选修该课程的人数。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020919.png" alt="image-20240531091111076"></p>
+<p>​	4)求选修课超过3门课的学生学号。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020920.png" alt="image-20240531091326847"></p>
+]]></content>
       <categories>
         <category>数据库</category>
       </categories>
@@ -614,177 +644,6 @@
 <h4 id="6）模糊查询"><a href="#6）模糊查询" class="headerlink" title="6）模糊查询"></a>6）模糊查询</h4><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020401.png" alt="image-20240608195822689" style="zoom: 33%;" />
 
 <img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020402.png" alt="image-20240608200105572" style="zoom: 33%;" />]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>数据库</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>树莓派更改当前用户密码</title>
-    <url>/2025/06/26/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%9B%B4%E6%94%B9%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81/</url>
-    <content><![CDATA[<h1 id="树莓派更改当前用户密码"><a href="#树莓派更改当前用户密码" class="headerlink" title="树莓派更改当前用户密码"></a>树莓派更改当前用户密码</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo raspi-config</span><br></pre></td></tr></table></figure>
-
-<p>打开树莓派配置。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414940.png" alt="image-20250628211158069"></p>
-<ul>
-<li>操作方式：上下键<code>↑</code> <code>↓</code>选择，回车确认，Tab键转到下方按键（上图中为<code>&lt;Select&gt;</code>与<code>&lt;finish&gt;</code>）</li>
-</ul>
-<p>选择<code>1 System Options</code>，回车确认，进入子菜单。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414941.png" alt="image-20250628211227592"></p>
-<p>选择<code>S3 Password</code>，回车确认，进入如下界面：</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414942.png" alt="屏幕截图 2025-06-28 211251"></p>
-<p>按下回车，回到终端，如下图。在光标处直接输入新密码，输入完毕后回车。<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414944.png" alt="屏幕截图 2025-06-28 211752"></p>
-<p>再次输入新密码，输入完毕后回车。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414945.png" alt="屏幕截图 2025-06-28 212647"></p>
-<p>出现如下界面即表示密码更新成功。回车选择OK即可。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414946.png" alt="image-20250628213115050"></p>
-]]></content>
-      <categories>
-        <category>树莓派</category>
-      </categories>
-      <tags>
-        <tag>树莓派</tag>
-        <tag>Raspberry Pi</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>树莓派启用root用户</title>
-    <url>/2025/06/26/%E6%A0%91%E8%8E%93%E6%B4%BE%E5%90%AF%E7%94%A8root%E7%94%A8%E6%88%B7/</url>
-    <content><![CDATA[<h2 id="树莓派启用root账户"><a href="#树莓派启用root账户" class="headerlink" title="树莓派启用root账户"></a>树莓派启用root账户</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo passwd root </span><br></pre></td></tr></table></figure>
-
-<p>执行后提示设置密码，输入2遍确认。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo passwd --unlock root</span><br></pre></td></tr></table></figure>
-
-<p>解锁root账户。</p>
-<blockquote>
-<p>如需再次锁定，将<code>unlock</code>改成<code>lock</code>即可。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">su</span><br></pre></td></tr></table></figure>
-
-<p>输入刚设置的密码，进入root账户。</p>
-]]></content>
-      <categories>
-        <category>树莓派</category>
-      </categories>
-      <tags>
-        <tag>树莓派</tag>
-        <tag>Raspberry Pi</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>笔记本电脑扬声器不发声的解决方法</title>
-    <url>/2025/07/03/%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E6%89%AC%E5%A3%B0%E5%99%A8%E4%B8%8D%E5%8F%91%E5%A3%B0%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
-    <content><![CDATA[<h1 id="笔记本电脑扬声器不发声的解决方法"><a href="#笔记本电脑扬声器不发声的解决方法" class="headerlink" title="笔记本电脑扬声器不发声的解决方法"></a>笔记本电脑扬声器不发声的解决方法</h1><ol>
-<li><p><code>Win</code>+<code>R</code>打开运行对话框，输入<code>services.msc</code>，回车。<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507031536568.png" alt="image-20250703153312973"></p>
-</li>
-<li><p>在服务列表中找到<code>Windows Audio</code>，右键点击，选择重新启动。</p>
-</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507031536569.png" alt="image-20250703153521488"></p>
-]]></content>
-      <categories>
-        <category>踩坑记录</category>
-      </categories>
-      <tags>
-        <tag>解决方法</tag>
-        <tag>笔记本电脑</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>笔记本电脑连接5G网络后无法上网的解决方法</title>
-    <url>/2025/07/03/%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E8%BF%9E%E6%8E%A55G%E7%BD%91%E7%BB%9C%E5%90%8E%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
-    <content><![CDATA[<h1 id="笔记本电脑连接5G网络后无法上网的解决方法"><a href="#笔记本电脑连接5G网络后无法上网的解决方法" class="headerlink" title="笔记本电脑连接5G网络后无法上网的解决方法"></a>笔记本电脑连接5G网络后无法上网的解决方法</h1><ol>
-<li><code>Win</code>+<code>R</code>打开运行对话框，输入<code>control</code>，回车打开控制面板。</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957850.png" alt="image-20250703164543336"></p>
-<ol start="2">
-<li>选择<code>查看网络状态和任务</code></li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957851.png" alt="image-20250703164652988"></p>
-<ol start="3">
-<li>点击红框处<code>WLAN(你的WiFi名)</code></li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957852.png" alt="屏幕截图 2025-07-03 164735"></p>
-<ol start="4">
-<li>点击<code>属性</code></li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957853.png" alt="屏幕截图 2025-07-03 165704"></p>
-<ol start="5">
-<li>点击<code>配置</code></li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957854.png" alt="image-20250703170041813"></p>
-<ol start="6">
-<li>选择上方<code>高级</code>选项卡</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957855.png" alt="image-20250703170125385"></p>
-<ol start="7">
-<li>在左边属性栏中找到<code>首选频带</code>，选择<code>3.首选5GHz频带</code>，点击<code>确定</code>。观察到窗口闪动，说明配置成功，连接5GHz WiFi时可以顺利上网了。</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957856.png" alt="image-20250703170420709"></p>
-<ol start="8">
-<li>若窗口不闪动，说明配置可能未更改成功。此时根据以上步骤，更改7.中任意一属性的值，点击确定，再重复一样的步骤将值改回原样。重复这种行为，直到点击<code>确定</code>时观察到窗口闪动。</li>
-</ol>
-]]></content>
-      <categories>
-        <category>踩坑记录</category>
-      </categories>
-      <tags>
-        <tag>解决方法</tag>
-        <tag>笔记本电脑</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>谷歌账号注册时+86手机号无法用于验证的解决方案</title>
-    <url>/2025/07/05/%E8%B0%B7%E6%AD%8C%E8%B4%A6%E5%8F%B7%E6%B3%A8%E5%86%8C%E6%97%B6-86%E6%89%8B%E6%9C%BA%E5%8F%B7%E6%97%A0%E6%B3%95%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
-    <content><![CDATA[<h2 id="谷歌账号注册时-86手机号无法用于验证的解决方案"><a href="#谷歌账号注册时-86手机号无法用于验证的解决方案" class="headerlink" title="谷歌账号注册时+86手机号无法用于验证的解决方案"></a>谷歌账号注册时+86手机号无法用于验证的解决方案</h2><p>问题：谷歌账号注册时使用+86手机号验证，提示“此电话号码无法用于进行验证”。</p>
-<p>解决办法：通过将谷歌浏览器默认语言设置为英文</p>
-<ol>
-<li><p>打开Google Chrome，点击<strong>设置-语言</strong>，点击<strong>添加语言</strong>，找到english，添加。<img src="/%E8%B0%B7%E6%AD%8C%E8%B4%A6%E5%8F%B7%E6%B3%A8%E5%86%8C%E6%97%B6-86%E6%89%8B%E6%9C%BA%E5%8F%B7%E6%97%A0%E6%B3%95%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.assets/202310211611393.png" alt="img"></p>
-</li>
-<li><p>点击<strong>以这种语言显示Google Chrome</strong>，并<strong>移到顶部。</strong></p>
-</li>
-</ol>
-<p><img src="/%E8%B0%B7%E6%AD%8C%E8%B4%A6%E5%8F%B7%E6%B3%A8%E5%86%8C%E6%97%B6-86%E6%89%8B%E6%9C%BA%E5%8F%B7%E6%97%A0%E6%B3%95%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.assets/202310211611394.png" alt="img"></p>
-<ol start="3">
-<li><p>&#x3D;&#x3D;<strong>删除中文</strong>&#x3D;&#x3D;（必做），重启Google Chrome。</p>
-</li>
-<li><p>打开谷歌注册页面进行注册（需要使用魔法），此时使用+86手机号不会提示“此电话号码无法用于进行验证”。</p>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>踩坑记录</category>
-      </categories>
-      <tags>
-        <tag>解决方法</tag>
-        <tag>Google</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>实验五-数据库的组合与统计查询实验</title>
-    <url>/2025/06/23/%E5%AE%9E%E9%AA%8C%E4%BA%94-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E7%BB%84%E5%90%88%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%9F%A5%E8%AF%A2%E5%AE%9E%E9%AA%8C/</url>
-    <content><![CDATA[<h1 id="实验五-数据库的组合与统计查询实验"><a href="#实验五-数据库的组合与统计查询实验" class="headerlink" title="实验五 数据库的组合与统计查询实验"></a>实验五 数据库的组合与统计查询实验</h1><h3 id="实验题目和要求："><a href="#实验题目和要求：" class="headerlink" title="实验题目和要求："></a>实验题目和要求：</h3><p>检查并修改图书读者库的数据，使之与表10-8至表10-10的数据一致；<br>检查并修改学生课程库的数据，便之与表10-11至表10-13的数据一致；<br>将下列查询要求用T-SQL语句表示；<br>在SSMS的查询分析器中输人相应的T-SQL语旬，执行并在结果区中查看内容；<br>结果不正确时要对T-SQL语句修改，直到正确为止。</p>
-<h3 id="1-在图书读者数据库中，按下列要求查询"><a href="#1-在图书读者数据库中，按下列要求查询" class="headerlink" title="(1) 在图书读者数据库中，按下列要求查询"></a>(1) 在图书读者数据库中，按下列要求查询</h3><p>​	1)查找图书类别，要求类别中最高图书定价不低于全部按类别分组的平均定价的2倍。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020912.png" alt="image-20240606230329833"></p>
-<p>​	2)求机械工业出版社出版的各类图书的平均定价，用GROUP BY表示。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020913.png" alt="image-20240531082608255"></p>
-<p>​	3)列出计算机类图书的书号、名称及价格，最后求出册数和总价格。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020914.png"></p>
-<p>​	4)列出计算机类图书的书号、名称及价格，并求出各出版社这类书的总价格，最后求出全部册数和总价格。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020915.png"></p>
-<p>​	5)查询计算机类和机械工业出版社出版的图书。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020916.png" alt="image-20240531090152465"></p>
-<h3 id="2-在学生课程数据库中，按下列要求查询"><a href="#2-在学生课程数据库中，按下列要求查询" class="headerlink" title="(2) 在学生课程数据库中，按下列要求查询"></a>(2) 在学生课程数据库中，按下列要求查询</h3><p>​	1)求学生的总人数。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020917.png" alt="image-20240531090441230"></p>
-<p>​	2)求选修了课程的学生人数。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020918.png" alt="image-20240531090657034"></p>
-<p>​	3)求课程和选修该课程的人数。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020919.png" alt="image-20240531091111076"></p>
-<p>​	4)求选修课超过3门课的学生学号。</p>
-<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506231020920.png" alt="image-20240531091326847"></p>
-]]></content>
       <categories>
         <category>数据库</category>
       </categories>
@@ -865,6 +724,147 @@
       </categories>
       <tags>
         <tag>数据库</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树莓派启用root用户</title>
+    <url>/2025/06/26/%E6%A0%91%E8%8E%93%E6%B4%BE%E5%90%AF%E7%94%A8root%E7%94%A8%E6%88%B7/</url>
+    <content><![CDATA[<h2 id="树莓派启用root账户"><a href="#树莓派启用root账户" class="headerlink" title="树莓派启用root账户"></a>树莓派启用root账户</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo passwd root </span><br></pre></td></tr></table></figure>
+
+<p>执行后提示设置密码，输入2遍确认。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo passwd --unlock root</span><br></pre></td></tr></table></figure>
+
+<p>解锁root账户。</p>
+<blockquote>
+<p>如需再次锁定，将<code>unlock</code>改成<code>lock</code>即可。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">su</span><br></pre></td></tr></table></figure>
+
+<p>输入刚设置的密码，进入root账户。</p>
+]]></content>
+      <categories>
+        <category>树莓派</category>
+      </categories>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>Raspberry Pi</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树莓派更改当前用户密码</title>
+    <url>/2025/06/26/%E6%A0%91%E8%8E%93%E6%B4%BE%E6%9B%B4%E6%94%B9%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81/</url>
+    <content><![CDATA[<h1 id="树莓派更改当前用户密码"><a href="#树莓派更改当前用户密码" class="headerlink" title="树莓派更改当前用户密码"></a>树莓派更改当前用户密码</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo raspi-config</span><br></pre></td></tr></table></figure>
+
+<p>打开树莓派配置。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414940.png" alt="image-20250628211158069"></p>
+<ul>
+<li>操作方式：上下键<code>↑</code> <code>↓</code>选择，回车确认，Tab键转到下方按键（上图中为<code>&lt;Select&gt;</code>与<code>&lt;finish&gt;</code>）</li>
+</ul>
+<p>选择<code>1 System Options</code>，回车确认，进入子菜单。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414941.png" alt="image-20250628211227592"></p>
+<p>选择<code>S3 Password</code>，回车确认，进入如下界面：</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414942.png" alt="屏幕截图 2025-06-28 211251"></p>
+<p>按下回车，回到终端，如下图。在光标处直接输入新密码，输入完毕后回车。<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414944.png" alt="屏幕截图 2025-06-28 211752"></p>
+<p>再次输入新密码，输入完毕后回车。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414945.png" alt="屏幕截图 2025-06-28 212647"></p>
+<p>出现如下界面即表示密码更新成功。回车选择OK即可。</p>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202506291414946.png" alt="image-20250628213115050"></p>
+]]></content>
+      <categories>
+        <category>树莓派</category>
+      </categories>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>Raspberry Pi</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>笔记本电脑连接5G网络后无法上网的解决方法</title>
+    <url>/2025/07/03/%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E8%BF%9E%E6%8E%A55G%E7%BD%91%E7%BB%9C%E5%90%8E%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BD%91%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<h1 id="笔记本电脑连接5G网络后无法上网的解决方法"><a href="#笔记本电脑连接5G网络后无法上网的解决方法" class="headerlink" title="笔记本电脑连接5G网络后无法上网的解决方法"></a>笔记本电脑连接5G网络后无法上网的解决方法</h1><ol>
+<li><code>Win</code>+<code>R</code>打开运行对话框，输入<code>control</code>，回车打开控制面板。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957850.png" alt="image-20250703164543336"></p>
+<ol start="2">
+<li>选择<code>查看网络状态和任务</code></li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957851.png" alt="image-20250703164652988"></p>
+<ol start="3">
+<li>点击红框处<code>WLAN(你的WiFi名)</code></li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957852.png" alt="屏幕截图 2025-07-03 164735"></p>
+<ol start="4">
+<li>点击<code>属性</code></li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957853.png" alt="屏幕截图 2025-07-03 165704"></p>
+<ol start="5">
+<li>点击<code>配置</code></li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957854.png" alt="image-20250703170041813"></p>
+<ol start="6">
+<li>选择上方<code>高级</code>选项卡</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957855.png" alt="image-20250703170125385"></p>
+<ol start="7">
+<li>在左边属性栏中找到<code>首选频带</code>，选择<code>3.首选5GHz频带</code>，点击<code>确定</code>。观察到窗口闪动，说明配置成功，连接5GHz WiFi时可以顺利上网了。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507050957856.png" alt="image-20250703170420709"></p>
+<ol start="8">
+<li>若窗口不闪动，说明配置可能未更改成功。此时根据以上步骤，更改7.中任意一属性的值，点击确定，再重复一样的步骤将值改回原样。重复这种行为，直到点击<code>确定</code>时观察到窗口闪动。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>踩坑记录</category>
+      </categories>
+      <tags>
+        <tag>解决方法</tag>
+        <tag>笔记本电脑</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>笔记本电脑扬声器不发声的解决方法</title>
+    <url>/2025/07/03/%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E6%89%AC%E5%A3%B0%E5%99%A8%E4%B8%8D%E5%8F%91%E5%A3%B0%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<h1 id="笔记本电脑扬声器不发声的解决方法"><a href="#笔记本电脑扬声器不发声的解决方法" class="headerlink" title="笔记本电脑扬声器不发声的解决方法"></a>笔记本电脑扬声器不发声的解决方法</h1><ol>
+<li><p><code>Win</code>+<code>R</code>打开运行对话框，输入<code>services.msc</code>，回车。<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507031536568.png" alt="image-20250703153312973"></p>
+</li>
+<li><p>在服务列表中找到<code>Windows Audio</code>，右键点击，选择重新启动。</p>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202507031536569.png" alt="image-20250703153521488"></p>
+]]></content>
+      <categories>
+        <category>踩坑记录</category>
+      </categories>
+      <tags>
+        <tag>解决方法</tag>
+        <tag>笔记本电脑</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>谷歌账号注册时+86手机号无法用于验证的解决方案</title>
+    <url>/2025/07/05/%E8%B0%B7%E6%AD%8C%E8%B4%A6%E5%8F%B7%E6%B3%A8%E5%86%8C%E6%97%B6-86%E6%89%8B%E6%9C%BA%E5%8F%B7%E6%97%A0%E6%B3%95%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    <content><![CDATA[<h2 id="谷歌账号注册时-86手机号无法用于验证的解决方案"><a href="#谷歌账号注册时-86手机号无法用于验证的解决方案" class="headerlink" title="谷歌账号注册时+86手机号无法用于验证的解决方案"></a>谷歌账号注册时+86手机号无法用于验证的解决方案</h2><p>问题：谷歌账号注册时使用+86手机号验证，提示“此电话号码无法用于进行验证”。</p>
+<p>解决办法：通过将谷歌浏览器默认语言设置为英文</p>
+<ol>
+<li><p>打开Google Chrome，点击<strong>设置-语言</strong>，点击<strong>添加语言</strong>，找到english，添加。<img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202310211611393.png" alt="img"></p>
+</li>
+<li><p>点击<strong>以这种语言显示Google Chrome</strong>，并<strong>移到顶部。</strong></p>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/undefined-0/image-store/main/PicGo/202310211611394.png" alt="img"></p>
+<ol start="3">
+<li><p><strong>删除中文</strong>（必做），重启Google Chrome。</p>
+</li>
+<li><p>打开谷歌注册页面进行注册（需要使用魔法），此时使用+86手机号不会提示“此电话号码无法用于进行验证”。</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>踩坑记录</category>
+      </categories>
+      <tags>
+        <tag>解决方法</tag>
+        <tag>Google</tag>
       </tags>
   </entry>
 </search>
